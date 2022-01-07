@@ -24,13 +24,13 @@ def requires_grad(param):
 
 
 if __name__ == '__main__':
-    batch_size = 5
-    lr = 0.001
-    epochs = 4
+    batch_size = 8
+    lr = 0.1
+    epochs = 2
     num_workers = 1
     device = torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 2)
+    data_train = PrepData(n_samples=batch_size * 10)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -44,12 +44,12 @@ if __name__ == '__main__':
     loss_func = CalculateLoss().to(device)
     print("Setup loss function...")
 
-    for epoch in range(0, epochs):
+    for epoch in range(1, epochs+1):
 
         iterator_train = iter(data.DataLoader(
             data_train,
             batch_size=batch_size,
-            #num_workers=num_workers,
+            # num_workers=num_workers,
             sampler=SubsetSampler(0, data_train.num_imgs)))
 
         # TRAINING LOOP
@@ -68,7 +68,6 @@ if __name__ == '__main__':
 
             loss_dict = loss_func(mask, output, gt)
             loss = 0.0
-
             # sums up each loss value
             for key, value in loss_dict.items():
                 loss += value
@@ -80,3 +79,5 @@ if __name__ == '__main__':
             loss.backward()
             # updates the weights
             optimizer.step()
+
+    torch.save(model.state_dict(), 'pc_model')
