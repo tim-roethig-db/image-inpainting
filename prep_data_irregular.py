@@ -38,18 +38,11 @@ class PrepData(torch.utils.data.Dataset):
                 # Choose maximum radius randomly 
                 maxRad = np.random.randint(6, 24)
                 # Create vector of random numbers
-                # TODO: Bei der Berechnung von x, y könnten fehler drin stecken
-                # Was ist max_patch_size * img.shape[]?
-                y = np.random.randint(
-                    low=maxRad+int(self.max_patch_size * img.shape[1]), 
-                    high=img.shape[1] - int(self.max_patch_size * img.shape[2]), 
-                    size=lines)
-                x = np.random.randint(
-                    low=maxRad+int(self.max_patch_size * img.shape[1]), 
-                    high=img.shape[2] - int(self.max_patch_size * img.shape[2]) - maxRad, 
-                    size=lines)
+                # Out of bounds errors may occur here
+                x = np.random.randint(maxRad+1, img.shape[1]-maxRad-1, 2)
+                y = np.random.randint(maxRad+1, img.shape[2]-maxRad-1, 2)
     
-                row, col = skimage.draw.line(x[i], y[i], x[i+1], y[i+1])
+                row, col = skimage.draw.line(x[0], y[0], x[1], y[1])
                 length = len(row)
                 for j in range(length):
                     # TODO: find a better function that is more random but smooth
@@ -59,11 +52,13 @@ class PrepData(torch.utils.data.Dataset):
                     upperBound = min(max(function, 5), maxRad)
                     radius = np.random.randint(4, upperBound)
                     rowCirc, colCirc = skimage.draw.disk((row[j], col[j]), radius)
-                    mask[rowCirc, colCirc] = 0
+                    mask[:, rowCirc, colCirc] = 0
     
         img = torch.as_tensor(img, dtype=torch.float64)
     
         return (img * mask), mask, img
+
+# How to display multiple images???
 
 if __name__ == '__main__':
     mi, m, i = PrepData()[1]
