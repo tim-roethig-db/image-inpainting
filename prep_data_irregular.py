@@ -58,7 +58,7 @@ class PrepData(torch.utils.data.Dataset):
     
         return (img * mask), mask, img
 
-# How to display multiple images???
+# How to process multiple images?
 
 if __name__ == '__main__':
     mi, m, i = PrepData()[1]
