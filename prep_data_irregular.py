@@ -35,15 +35,15 @@ class PrepData(torch.utils.data.Dataset):
         img = self.img_transformer(img.convert('RGB'))
         # Determine how many lines should be defined
         # Can be tweaked:
-        maxLines = 40
+        maxLines = 15
         lines = np.random.randint(1, maxLines)
         lines *= 2
         lowRad = 3
         highRad = 16
         
-        ps = np.linspace(0.95, 0, num=200, endpoint=False)
-        ps = ps / ps.sum()
-        linebounds = np.arange(1, 201)
+        # ps = np.linspace(0.95, 0, num=200, endpoint=False)
+        # ps = ps / ps.sum()
+        # linebounds = np.arange(1, 201)
         
         # Mask init
         mask = torch.ones(size=img.shape, dtype=torch.float64)
@@ -55,21 +55,21 @@ class PrepData(torch.utils.data.Dataset):
                 # Create vector of random numbers
                 # Out of bounds errors may occur here
                 
-                # Uncomment to increase probability of short lines for more patchy look
-                # Also uncomment linebounds and ps above for loop
-                x = np.zeros(2)
-                y = np.zeros(2)
-                linebound = np.random.choice(linebounds, p=ps)
-                x[0] = np.random.randint(maxRad+1, img.shape[1]-maxRad-1)
-                x[1] = np.random.randint(max(maxRad+1, x[0]-linebound), min(img.shape[1]-maxRad-1, x[0]+linebound))
-                y[0] = np.random.randint(maxRad+1, img.shape[2]-maxRad-1)
-                y[1] = np.random.randint(max(maxRad+1, y[0]-linebound), min(img.shape[2]-maxRad-1, y[0]+linebound))
-                x = np.int_(x)
-                y = np.int_(y)
+                # # Uncomment to increase probability of short lines for more patchy look
+                # # Also uncomment linebounds and ps above for loop
+                # x = np.zeros(2)
+                # y = np.zeros(2)
+                # linebound = np.random.choice(linebounds, p=ps)
+                # x[0] = np.random.randint(maxRad+1, img.shape[1]-maxRad-1)
+                # x[1] = np.random.randint(max(maxRad+1, x[0]-linebound), min(img.shape[1]-maxRad-1, x[0]+linebound))
+                # y[0] = np.random.randint(maxRad+1, img.shape[2]-maxRad-1)
+                # y[1] = np.random.randint(max(maxRad+1, y[0]-linebound), min(img.shape[2]-maxRad-1, y[0]+linebound))
+                # x = np.int_(x)
+                # y = np.int_(y)
 
-                # # TODO: Now: all lines are more in the center, since maxRad is used as bound for all lines, but they don´t have circles with maxRad
-                # x = np.random.randint(maxRad+1, img.shape[1]-maxRad-1, 2)
-                # y = np.random.randint(maxRad+1, img.shape[2]-maxRad-1, 2)
+                # TODO: Now: all lines are more in the center, since maxRad is used as bound for all lines, but they don´t have circles with maxRad
+                x = np.random.randint(maxRad+1, img.shape[1]-maxRad-1, 2)
+                y = np.random.randint(maxRad+1, img.shape[2]-maxRad-1, 2)
     
                 row, col = skimage.draw.line(x[0], y[0], x[1], y[1])
                 length = len(row)
@@ -89,15 +89,16 @@ class PrepData(torch.utils.data.Dataset):
         return (img * mask), mask, img
 
 if __name__ == '__main__':
-    for j in tqdm(range(1, 1000)):
+    # Save masks as tensor files (.pt) and load them later to decrease learning time
+    for j in tqdm(range(1, 1001)):
         mi, m, i = PrepData()[1]
-        # Save masks as tensor files (.pt) and load them later to decrease learning time
         torch.save(m, (os.getcwd() + f'\\masks\\mask_{j}.pt'))
+    # mi, m, i = PrepData()[1]
     plt.imshow(mi.permute(1, 2, 0))
     plt.show()
-    print(mi.shape)
-    print(mi.dtype)
-    print(m.shape)
-    print(m.dtype)
-    print(i.shape)
-    print(i.dtype)
+    # print(mi.shape)
+    # print(mi.dtype)
+    # print(m.shape)
+    # print(m.dtype)
+    # print(i.shape)
+    # print(i.dtype)
