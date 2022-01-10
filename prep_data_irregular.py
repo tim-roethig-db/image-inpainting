@@ -22,35 +22,46 @@ class PrepData(torch.utils.data.Dataset):
         self.img_transformer = transforms.ToTensor()
         
     def __getitem__(self, index):
+        """
+        Parameters to tweak:
+        --- maxLines: Maximal number of random lines
+        --- lines (low): Minimum number of random lines
+        --- lowRad: Minimum radius of circles drawn on lines
+        --- highRad: Maximum radius of circles drawn on lines
+        --- function: Determines pattern of circle sizes on one line
+        """
         img = Image.open(self.img_paths[index]).resize(size=(256, 256))
         img = self.img_transformer(img.convert('RGB'))
         # Determine how many lines should be defined
         # Can be tweaked
-        maxLines = 25
+        maxLines = 15
         lines = np.random.randint(1, maxLines)
         lines *= 2
-
+        lowRad = 3
+        highRad = 16
         # Mask init
         mask = torch.ones(size=img.shape, dtype=torch.float64)
         # Make lines
         for i in range(lines):
             if i % 2 == 0:
-                # Choose maximum radius randomly 
-                maxRad = np.random.randint(6, 24)
+                # Choose maximum radius randomly
+                maxRad = np.random.randint(lowRad, highRad)
                 # Create vector of random numbers
                 # Out of bounds errors may occur here
+                # TODO: Maybe increase probability of short lines for more patchy look
                 x = np.random.randint(maxRad+1, img.shape[1]-maxRad-1, 2)
                 y = np.random.randint(maxRad+1, img.shape[2]-maxRad-1, 2)
     
                 row, col = skimage.draw.line(x[0], y[0], x[1], y[1])
                 length = len(row)
+                # Draw arbitrary circles on each point of each line
                 for j in range(length):
-                    # TODO: find a better function that is more random but smooth
+                    # TODO: find a better function that is more random and smoother
                     rand = np.random.randint(0, 10000)
                     # Hier können out of bounds-Fehler entstehen
                     function = maxRad*np.sin(rand)*2
-                    upperBound = min(max(function, 5), maxRad)
-                    radius = np.random.randint(4, upperBound)
+                    upperBound = min(max(function, lowRad), maxRad)
+                    radius = np.random.randint(lowRad-1, upperBound)
                     rowCirc, colCirc = skimage.draw.disk((row[j], col[j]), radius)
                     mask[:, rowCirc, colCirc] = 0
     
