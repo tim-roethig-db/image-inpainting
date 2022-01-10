@@ -33,12 +33,17 @@ class PrepData(torch.utils.data.Dataset):
         img = Image.open(self.img_paths[index]).resize(size=(256, 256))
         img = self.img_transformer(img.convert('RGB'))
         # Determine how many lines should be defined
-        # Can be tweaked
+        # Can be tweaked:
         maxLines = 15
         lines = np.random.randint(1, maxLines)
         lines *= 2
         lowRad = 3
         highRad = 16
+        
+        # ps = np.linspace(0.95, 0, num=200, endpoint=False)
+        # ps = ps / ps.sum()
+        # linebounds = np.arange(1, 201)
+        
         # Mask init
         mask = torch.ones(size=img.shape, dtype=torch.float64)
         # Make lines
@@ -48,7 +53,20 @@ class PrepData(torch.utils.data.Dataset):
                 maxRad = np.random.randint(lowRad, highRad)
                 # Create vector of random numbers
                 # Out of bounds errors may occur here
-                # TODO: Maybe increase probability of short lines for more patchy look
+                
+                # # Uncomment to increase probability of short lines for more patchy look
+                # # Also uncomment linebounds and ps above for loop
+                # x = np.zeros(2)
+                # y = np.zeros(2)
+                # linebound = np.random.choice(linebounds, p=ps)
+                # x[0] = np.random.randint(maxRad+1, img.shape[1]-maxRad-1)
+                # x[1] = np.random.randint(max(maxRad+1, x[0]-linebound), min(img.shape[1]-maxRad-1, x[0]+linebound))
+                # y[0] = np.random.randint(maxRad+1, img.shape[2]-maxRad-1)
+                # y[1] = np.random.randint(max(maxRad+1, y[0]-linebound), min(img.shape[2]-maxRad-1, y[0]+linebound))
+                # x = np.int_(x)
+                # y = np.int_(y)
+
+                # TODO: Now: all lines are more in the center, since maxRad is used as bound for all lines, but they don´t have circles with maxRad
                 x = np.random.randint(maxRad+1, img.shape[1]-maxRad-1, 2)
                 y = np.random.randint(maxRad+1, img.shape[2]-maxRad-1, 2)
     
