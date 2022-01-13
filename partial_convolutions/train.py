@@ -1,6 +1,7 @@
 import torch
-import torch.nn as nn
 from torch.utils import data
+import os
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from prep_data import PrepData
 from model import PartialConvNet
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     batch_size = 8
     lr = 0.1
     epochs = 4
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
     data_train = PrepData(n_samples=batch_size * 10)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
