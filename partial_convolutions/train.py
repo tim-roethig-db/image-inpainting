@@ -26,8 +26,7 @@ def requires_grad(param):
 if __name__ == '__main__':
     batch_size = 8
     lr = 0.1
-    epochs = 2
-    num_workers = 1
+    epochs = 4
     device = torch.device('cpu')
 
     data_train = PrepData(n_samples=batch_size * 10)
@@ -49,7 +48,6 @@ if __name__ == '__main__':
         iterator_train = iter(data.DataLoader(
             data_train,
             batch_size=batch_size,
-            # num_workers=num_workers,
             sampler=SubsetSampler(0, data_train.num_imgs)))
 
         # TRAINING LOOP

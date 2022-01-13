@@ -99,22 +99,3 @@ class PartialConvNet(nn.Module):
                 if isinstance(module, nn.BatchNorm2d) and "enc" in name:
                     # Sets batch normalization layers to evaluation mode
                     module.eval()
-
-
-if __name__ == '__main__':
-    size = (1, 3, 256, 256)
-    inp = torch.ones(size)
-    input_mask = torch.ones(size)
-    input_mask[:, :, 100:, :][:, :, :, 100:] = 0
-
-    conv = PartialConvNet()
-    l1 = nn.L1Loss()
-    inp.requires_grad = True
-
-    output = conv(inp, input_mask)
-    loss = l1(output, torch.randn(1, 3, 256, 256))
-    loss.backward()
-
-    assert (torch.sum(inp.grad != inp.grad).item() == 0)
-    assert (torch.sum(torch.isnan(conv.decoder_1.input_conv.weight.grad)).item() == 0)
-    assert (torch.sum(torch.isnan(conv.decoder_1.input_conv.bias.grad)).item() == 0)
