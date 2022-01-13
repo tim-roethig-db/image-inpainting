@@ -17,7 +17,9 @@ class PrepData(torch.utils.data.Dataset):
         self.min_patch_size = 0.2
         self.max_patch_size = 0.3
 
-        self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data_celeba/*.jpg')[:self.n_samples]
+        id = os.environ["SLURM_JOB_ID"]
+        #self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data/data_celeba/*.jpg')[:self.n_samples]
+        self.img_paths = glob.glob(f'/scratch/{id}' + '/data/data_celeba/*.jpg')[:self.n_samples]
         self.num_imgs = len(self.img_paths)
 
         self.img_transformer = transforms.ToTensor()

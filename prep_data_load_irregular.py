@@ -5,18 +5,21 @@ import os
 import glob
 import torch
 from torchvision import transforms
-from tqdm import tqdm
+#from tqdm import tqdm
 
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples=100):
+    def __init__(self, n_samples):
         super().__init__()
 
         self.n_samples = n_samples
         self.min_patch_size = 0.2
         self.max_patch_size = 0.3
-
-        self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data_celeba/*.jpg')[:self.n_samples]
+        
+        id = os.environ["SLURM_JOB_ID"]
+        #self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data/data_celeba/*.jpg')[:self.n_samples]
+        self.img_paths = glob.glob(f'/scratch/{id}' + '/data/data_celeba/*.jpg')[:self.n_samples]
+        # self.img_paths = glob.glob(f'/scratch/{$SLURM_JOB_ID}/data/data_celeba/*.jpg')[:self.n_samples]
         self.num_imgs = len(self.img_paths)
 
         self.img_transformer = transforms.ToTensor()
@@ -36,8 +39,10 @@ class PrepData(torch.utils.data.Dataset):
         
         # Mask pt files have to be saved in image-inpainting/mask
         maskindex = np.random.randint(1, 2001)
-        mask = torch.load(os.getcwd() + f'\\masks\\mask_{maskindex}.pt')
-    
+        # mask = torch.load(os.path.dirname(os.path.abspath(__file__)) + f'/data/masks/mask_{maskindex}.pt')
+        id = os.environ["SLURM_JOB_ID"]
+        mask = torch.load(f'/scratch/{id}/data/masks/mask_{maskindex}.pt')
+
         return (img * mask), mask, img
 
 if __name__ == '__main__':
@@ -46,8 +51,8 @@ if __name__ == '__main__':
     #     mi, m, i = PrepData()[1]
     #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j}.pt'))
     mi, m, i = PrepData()[1]
-    plt.imshow(mi.permute(1, 2, 0))
-    plt.show()
+    # plt.imshow(mi.permute(1, 2, 0))
+    # plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
