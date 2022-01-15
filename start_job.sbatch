@@ -14,10 +14,10 @@
 #SBATCH --partition=day
 # the slurm partition the job is queued to.
 
-#SBATCH --mem-per-cpu=6G
+#SBATCH --mem-per-cpu=3G
 # the job will need 12GB of memory equally distributed on 4 cpus.  (251GB are available in total on one node)
 
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #the job can use and see 1 GPUs (4 GPUs are available in total on one node)
 
 #SBATCH --time=20:00:00
@@ -41,13 +41,13 @@
 ####
 #b) copy all needed data to the jobs scratch folder
 ####
-cp -R /home/stud21/self-driving-cars/Matze_Praktikum/data /scratch/$SLURM_JOB_ID/
+cp -R /home/mollik/Image-Inpainting/data /scratch/$SLURM_JOB_ID/
 
 ####
 #c) Execute your file.
 ####
 
 # Uncomment to enable sbatch file
-singularity exec --nv /common/singularityImages/default.simg /home/stud21/miniconda3/envs/inpainting/bin/python train.py
+singularity exec --nv /common/singularityImages/default.simg /home/mollik/miniconda3/envs/inpainting/bin/python train.py
 
 echo DONE!
