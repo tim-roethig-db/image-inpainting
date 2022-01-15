@@ -8,16 +8,16 @@
 
 #resources:
 
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=6
 # the job can use and see 4 CPUs (from max 24).
 
 #SBATCH --partition=day
 # the slurm partition the job is queued to.
 
-#SBATCH --mem-per-cpu=3G
+#SBATCH --mem-per-cpu=6G
 # the job will need 12GB of memory equally distributed on 4 cpus.  (251GB are available in total on one node)
 
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #the job can use and see 1 GPUs (4 GPUs are available in total on one node)
 
 #SBATCH --time=20:00:00
@@ -26,10 +26,10 @@
 
 
 # After J, specify name of the job to avoid confusion
-#SBATCH --error=job.%J_test.err
+#SBATCH --error=job.%J_first_cycle.err
 # write the error output to job.*jobID*.err
 
-#SBATCH --output=job.%J_test.out
+#SBATCH --output=job.%J_first_cycle.out
 # write the standard output to job.*jobID*.out
 
 #SBATCH --mail-type=ALL
