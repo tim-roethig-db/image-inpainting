@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import torch
 
 from model import PartialConvNet
-from prep_data import PrepData
+from prep_data.prep_data import PrepData
+
 
 if __name__ == '__main__':
     device = torch.device('cpu')

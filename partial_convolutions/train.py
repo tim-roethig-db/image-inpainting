@@ -1,9 +1,7 @@
 import torch
 from torch.utils import data
-import os
-os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from prep_data import PrepData
+from prep_data.prep_data import PrepData
 from model import PartialConvNet
 from loss import CalculateLoss
 
@@ -25,7 +23,7 @@ def requires_grad(param):
 
 
 if __name__ == '__main__':
-    batch_size = 8
+    batch_size = 4
     lr = 0.1
     epochs = 4
     device = torch.device('cpu')
