@@ -14,7 +14,7 @@
 #SBATCH --partition=day
 # the slurm partition the job is queued to.
 
-#SBATCH --mem-per-cpu=10G
+#SBATCH --mem-per-cpu=20G
 # the job will need 12GB of memory equally distributed on 4 cpus.  (251GB are available in total on one node)
 
 #SBATCH --gres=gpu:2
@@ -26,10 +26,10 @@
 
 
 # After J, specify name of the job to avoid confusion
-#SBATCH --error=job.%J_emptyCache.err
+#SBATCH --error=job.%J_sampleSize.err
 # write the error output to job.*jobID*.err
 
-#SBATCH --output=job.%J_emptyCache.out
+#SBATCH --output=job.%J_sampleSize.out
 # write the standard output to job.*jobID*.out
 
 #SBATCH --mail-type=ALL
