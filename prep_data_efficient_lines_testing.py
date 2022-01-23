@@ -7,10 +7,11 @@ import glob
 import torch
 from torchvision import transforms
 #from tqdm import tqdm
+import time
 
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples=100):
+    def __init__(self, n_samples=3):
         super().__init__()
 
         self.n_samples = n_samples
@@ -38,7 +39,7 @@ class PrepData(torch.utils.data.Dataset):
         maxLines = 25
         lines = np.random.randint(1, maxLines)
         lines *= 2
-        lowRad = 3
+        lowRad = 5
         highRad = 16
 
         # Init storing vectors
@@ -54,8 +55,8 @@ class PrepData(torch.utils.data.Dataset):
         maxRad = np.random.randint(lowRad, highRad)
                 
         # Generate x and y coordinates for lines: x[even]=x_start, x[odd]=x_end
-        x = np.random.randint(1, img.shape[0]-1, size=lines)
-        y = np.random.randint(1, img.shape[1]-1, size=lines)
+        x = np.random.randint(1, img.shape[1]-1, size=lines)
+        y = np.random.randint(1, img.shape[2]-1, size=lines)
         x = np.int_(x)
         y = np.int_(y)
 
@@ -64,16 +65,16 @@ class PrepData(torch.utils.data.Dataset):
             if i % 2 == 0:
                 row, col = line(x[i], y[i], x[i+1], y[i+1])
                 # Store all line indices in these vectors
-                all_line_rows.append(row)
-                all_line_cols.append(col)
+                all_line_rows = np.append(all_line_rows, row)
+                all_line_cols = np.append(all_line_cols, col)
 
         # Decide how big the radius of disks should be        
-        rand = np.random.randint(0, 1000, 100)
+        rand = np.random.randint(0, 1000, len(all_line_rows))
 
         # Draw circles for every line coordinate
         for i in range(len(all_line_rows)):
             # Draw only every 6th circle
-            if i % 6 == 0:
+            if i % 3 == 0:
                 # Let radius vary
                 function = maxRad*np.sin(rand[i])*2
                 upperBound = min(max(function, lowRad), maxRad)
@@ -81,9 +82,9 @@ class PrepData(torch.utils.data.Dataset):
 
                 rowCirc, colCirc = disk((all_line_rows[i], all_line_cols[i]), 
                                         radius, 
-                                        shape=(img.shape[0], img.shape[1]))
-                all_circle_rows.append(rowCirc)
-                all_circle_cols.append(colCirc)
+                                        shape=(img.shape[1], img.shape[2]))
+                all_circle_rows = np.append(all_circle_rows, rowCirc)
+                all_circle_cols = np.append(all_circle_cols, colCirc)
 
         mask[:, all_circle_rows, all_circle_cols] = 0
         
@@ -92,6 +93,7 @@ class PrepData(torch.utils.data.Dataset):
         return (img * mask), mask, img
 
 if __name__ == '__main__':
+    start = time.time()
     # Save masks as tensor files (.pt) and load them later to decrease learning time
     # for j in tqdm(range(1, 1001)):
     #     mi, m, i = PrepData()[1]
@@ -105,6 +107,8 @@ if __name__ == '__main__':
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
+    end = time.time()
+    print("Time of execution of the NEW version: ", end-start)
 
 """
 Features lost due to optimization of speed:

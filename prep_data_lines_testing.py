@@ -7,10 +7,10 @@ import glob
 import torch
 from torchvision import transforms
 #from tqdm import tqdm
-
+import time
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples=100):
+    def __init__(self, n_samples=3):
         super().__init__()
 
         self.n_samples = n_samples
@@ -40,7 +40,7 @@ class PrepData(torch.utils.data.Dataset):
         maxLines = 25
         lines = np.random.randint(1, maxLines)
         lines *= 2
-        lowRad = 3
+        lowRad = 5
         highRad = 16
         
         ps = np.linspace(0.95, 0, num=200, endpoint=False)
@@ -91,16 +91,19 @@ class PrepData(torch.utils.data.Dataset):
         return (img * mask), mask, img
 
 if __name__ == '__main__':
+    start = time.time()
     # Save masks as tensor files (.pt) and load them later to decrease learning time
     # for j in tqdm(range(1, 1001)):
     #     mi, m, i = PrepData()[1]
     #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j+1000}.pt'))
     mi, m, i = PrepData()[1]
-    #plt.imshow(mi.permute(1, 2, 0))
-    #plt.show()
+    plt.imshow(mi.permute(1, 2, 0))
+    plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
+    end = time.time()
+    print("Time of execution of the OLD version: ", end-start)
