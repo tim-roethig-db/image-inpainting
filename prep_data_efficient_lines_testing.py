@@ -10,16 +10,14 @@ from torchvision import transforms
 
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples):
+    def __init__(self, n_samples=100):
         super().__init__()
 
         self.n_samples = n_samples
         self.min_patch_size = 0.2
         self.max_patch_size = 0.3
 
-        id = os.environ["SLURM_JOB_ID"]
-        #self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data/data_celeba/*.jpg')[:self.n_samples]
-        self.img_paths = glob.glob(f'/scratch/{id}' + '/data/data_celeba/*.jpg')[:self.n_samples]
+        self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data/data_celeba/*.jpg')[:self.n_samples]
         self.num_imgs = len(self.img_paths)
 
         self.img_transformer = transforms.ToTensor()
@@ -66,8 +64,8 @@ class PrepData(torch.utils.data.Dataset):
             if i % 2 == 0:
                 row, col = line(x[i], y[i], x[i+1], y[i+1])
                 # Store all line indices in these vectors
-                all_line_rows = all_line_rows.append(row)
-                all_line_cols = all_line_cols.append(col)
+                all_line_rows.append(row)
+                all_line_cols.append(col)
 
         # Decide how big the radius of disks should be        
         rand = np.random.randint(0, 1000, 100)
@@ -84,8 +82,8 @@ class PrepData(torch.utils.data.Dataset):
                 rowCirc, colCirc = disk((all_line_rows[i], all_line_cols[i]), 
                                         radius, 
                                         shape=(img.shape[0], img.shape[1]))
-                all_circle_rows = all_circle_rows.append(rowCirc)
-                all_circle_cols = all_circle_cols.append(colCirc)
+                all_circle_rows.append(rowCirc)
+                all_circle_cols.append(colCirc)
 
         mask[:, all_circle_rows, all_circle_cols] = 0
         

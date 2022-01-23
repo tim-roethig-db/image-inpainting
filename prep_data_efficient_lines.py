@@ -99,8 +99,8 @@ if __name__ == '__main__':
     #     mi, m, i = PrepData()[1]
     #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j+1000}.pt'))
     mi, m, i = PrepData()[1]
-    plt.imshow(mi.permute(1, 2, 0))
-    plt.show()
+    #plt.imshow(mi.permute(1, 2, 0))
+    #plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
