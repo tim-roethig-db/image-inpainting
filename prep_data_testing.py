@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import torch
 from torchvision import transforms
 from PIL import Image
+# BENCHMARK:
+from tqdm import tqdm
 import time
 
 
@@ -16,7 +18,6 @@ class PrepData(torch.utils.data.Dataset):
         self.min_patch_size = 0.2
         self.max_patch_size = 0.3
 
-        # Read from scratch/*SLURMjobID*
         self.img_paths = glob.glob(os.path.dirname(os.path.abspath(__file__)) + '/data/data_celeba/*.jpg')[:self.n_samples]
         self.num_imgs = len(self.img_paths)
 
@@ -54,17 +55,22 @@ class PrepData(torch.utils.data.Dataset):
 
 
 if __name__ == '__main__':
-    start = time.time()
-    # for i in range(1, 10):
-    #     mi, m, i = PrepData()[i]
-    mi, m, i = PrepData()[1]
-    end = time.time()
-    plt.imshow(mi.permute(1, 2, 0))
-    plt.show()
+    # start = time.time()
+    execution_times = ["REC_exec_time"]
+    for j in tqdm(range(1, 1001)):
+        start = time.time()
+        mi, m, i = PrepData()[1]
+        end = time.time()
+        execution_times.append(end-start)
+    np.savetxt('rectangles_time.csv', execution_times, delimiter=',', fmt='%s')
+    # mi, m, i = PrepData()[1]
+    # end = time.time()
+    # plt.imshow(mi.permute(1, 2, 0))
+    # plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
-    print("Time of execution of the rectangle version: ", end-start)
+    # print("Time of execution of the rectangle version: ", end-start)

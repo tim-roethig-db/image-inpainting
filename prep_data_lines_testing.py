@@ -6,7 +6,8 @@ import os
 import glob
 import torch
 from torchvision import transforms
-#from tqdm import tqdm
+# BENCHMARK:
+from tqdm import tqdm
 import time
 
 class PrepData(torch.utils.data.Dataset):
@@ -40,8 +41,13 @@ class PrepData(torch.utils.data.Dataset):
         maxLines = 25
         lines = np.random.randint(1, maxLines)
         # BENCHMARK:
-        disk_time = 0
         lines = 10
+        global disk_time
+        global start_disk
+        global end_disk
+        disk_time = 0
+        start_disk = 0
+        end_disk = 0
 
         lines *= 2
         lowRad = 5
@@ -93,6 +99,7 @@ class PrepData(torch.utils.data.Dataset):
                     radius = np.random.randint(lowRad-1, upperBound)
                     rowCirc, colCirc = disk((row[j], col[j]), radius)
                     mask[:, rowCirc, colCirc] = 0
+                
                 end_disk = time.time()
 
                 disk_time += (end_disk-start_disk)
@@ -102,20 +109,28 @@ class PrepData(torch.utils.data.Dataset):
         return (img * mask), mask, img
 
 if __name__ == '__main__':
-    start = time.time()
-    # Save masks as tensor files (.pt) and load them later to decrease learning time
-    # for j in tqdm(range(1, 1001)):
-    #     mi, m, i = PrepData()[1]
-    #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j+1000}.pt'))
-    mi, m, i = PrepData()[1]
-    end = time.time()
-    plt.imshow(mi.permute(1, 2, 0))
-    plt.show()
+    disk_time = 0
+    start_disk = 0
+    end_disk = 0
+    execution_times = ["OLD_exec_time"]
+    drawdisk_times = ["OLD_disk_time"]
+    # start = time.time()
+    for j in tqdm(range(1, 1001)):
+        start = time.time()
+        mi, m, i = PrepData()[1]
+        end = time.time()
+        execution_times.append(end-start)
+        drawdisk_times.append(disk_time)
+    np.savetxt('lines_time.csv', [p for p in zip(execution_times, drawdisk_times)], delimiter=',', fmt='%s')
+    # mi, m, i = PrepData()[1]
+    # end = time.time()
+    # plt.imshow(mi.permute(1, 2, 0))
+    # plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
-    print("Time of execution of the OLD version: ", end-start)
-    print("Time to draw disks with OLD version: ", disk_time)
+    # print("Time of execution of the OLD version: ", end-start)
+    # print("Time to draw disks with OLD version: ", disk_time)

@@ -6,7 +6,8 @@ import os
 import glob
 import torch
 from torchvision import transforms
-#from tqdm import tqdm
+# BENCHMARK:
+from tqdm import tqdm
 import time
 
 
@@ -39,7 +40,9 @@ class PrepData(torch.utils.data.Dataset):
         maxLines = 25
         lines = np.random.randint(1, maxLines)
         # BENCHMARK:
-        lines = 15
+        lines = 10
+        global start_disk
+        global end_disk
 
         lines *= 2
         lowRad = 5
@@ -93,33 +96,42 @@ class PrepData(torch.utils.data.Dataset):
                 all_circle_rows = np.append(all_circle_rows, rowCirc)
                 all_circle_cols = np.append(all_circle_cols, colCirc)
 
-        end_disk = time.time()
         # TODO: find a way to efficiently delete duplicates 
         # before this operation
         mask[:, all_circle_rows, all_circle_cols] = 0
+
+        end_disk = time.time()
         
         img = torch.as_tensor(img, dtype=torch.float64)
     
         return (img * mask), mask, img
 
 if __name__ == '__main__':
-    start = time.time()
-    # Save masks as tensor files (.pt) and load them later to decrease learning time
-    # for j in tqdm(range(1, 1001)):
-    #     mi, m, i = PrepData()[1]
-    #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j+1000}.pt'))
-    mi, m, i = PrepData()[1]
-    end = time.time()
-    plt.imshow(mi.permute(1, 2, 0))
-    plt.show()
+    start_disk = 0
+    end_disk = 0
+    execution_times = ["NEW_exec_time"]
+    drawdisk_times = ["NEW_disk_time"]
+    # start = time.time()
+    for j in tqdm(range(1, 1001)):
+        start = time.time()
+        mi, m, i = PrepData()[1]
+        end = time.time()
+        execution_times.append(end-start)
+        drawdisk_times.append(end_disk-start_disk)
+    np.savetxt('efficient_lines_time.csv', [p for p in zip(execution_times, drawdisk_times)], delimiter=',', fmt='%s')
+    # mi, m, i = PrepData()[1]
+    # end = time.time()
+    # plt.imshow(mi.permute(1, 2, 0))
+    # plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
-    print("Time of execution of the NEW version: ", end-start)
-    print("Time to draw disks with NEW version: ", end_disk-start_disk)
+
+    # print("Time of execution of the NEW version: ", end-start)
+    # print("Time to draw disks with NEW version: ", end_disk-start_disk)
 
 """
 Features lost due to optimization of speed:
