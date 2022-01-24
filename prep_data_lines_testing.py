@@ -38,9 +38,11 @@ class PrepData(torch.utils.data.Dataset):
         # Determine how many lines should be defined
         # Can be tweaked:
         maxLines = 25
-        # lines = np.random.randint(1, maxLines)
-        # Benchmark:
+        lines = np.random.randint(1, maxLines)
+        # BENCHMARK:
+        disk_time = 0
         lines = 10
+
         lines *= 2
         lowRad = 5
         highRad = 16
@@ -56,6 +58,8 @@ class PrepData(torch.utils.data.Dataset):
             if i % 2 == 0:
                 # Choose maximum radius randomly
                 maxRad = np.random.randint(lowRad, highRad)
+                # BENCHMARK: 
+                maxRad = 10
                 # Create vector of random numbers
                 # Out of bounds errors may occur here
                 
@@ -78,6 +82,8 @@ class PrepData(torch.utils.data.Dataset):
                 row, col = line(x[0], y[0], x[1], y[1])
                 length = len(row)
                 # Draw arbitrary circles on each point of each line
+                # BENCHMARK:
+                start_disk = time.time()
                 for j in range(length):
                     # TODO: find a better function that is more random and smoother
                     rand = np.random.randint(0, 10000)
@@ -87,6 +93,9 @@ class PrepData(torch.utils.data.Dataset):
                     radius = np.random.randint(lowRad-1, upperBound)
                     rowCirc, colCirc = disk((row[j], col[j]), radius)
                     mask[:, rowCirc, colCirc] = 0
+                end_disk = time.time()
+
+                disk_time += (end_disk-start_disk)
     
         img = torch.as_tensor(img, dtype=torch.float64)
     
@@ -109,3 +118,4 @@ if __name__ == '__main__':
     # print(i.shape)
     # print(i.dtype)
     print("Time of execution of the OLD version: ", end-start)
+    print("Time to draw disks with OLD version: ", disk_time)

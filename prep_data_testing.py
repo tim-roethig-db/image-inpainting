@@ -9,7 +9,7 @@ import time
 
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples=100):
+    def __init__(self, n_samples=3):
         super().__init__()
 
         self.n_samples = n_samples

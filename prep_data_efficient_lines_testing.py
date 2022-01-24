@@ -38,6 +38,9 @@ class PrepData(torch.utils.data.Dataset):
         # Can be tweaked:
         maxLines = 25
         lines = np.random.randint(1, maxLines)
+        # BENCHMARK:
+        lines = 15
+
         lines *= 2
         lowRad = 5
         highRad = 16
@@ -53,6 +56,8 @@ class PrepData(torch.utils.data.Dataset):
 
         # Choose maximum radius of circles
         maxRad = np.random.randint(lowRad, highRad)
+        # BENCHMARK: 
+        maxRad = 10
                 
         # Generate x and y coordinates for lines: x[even]=x_start, x[odd]=x_end
         x = np.random.randint(1, img.shape[1]-1, size=lines)
@@ -72,6 +77,8 @@ class PrepData(torch.utils.data.Dataset):
         rand = np.random.randint(0, 1000, len(all_line_rows))
 
         # Draw circles for every line coordinate
+        # BENCHMARK:
+        start_disk = time.time()
         for i in range(len(all_line_rows)):
             # Draw only every 6th circle
             if i % 3 == 0:
@@ -86,6 +93,7 @@ class PrepData(torch.utils.data.Dataset):
                 all_circle_rows = np.append(all_circle_rows, rowCirc)
                 all_circle_cols = np.append(all_circle_cols, colCirc)
 
+        end_disk = time.time()
         # TODO: find a way to efficiently delete duplicates 
         # before this operation
         mask[:, all_circle_rows, all_circle_cols] = 0
@@ -111,6 +119,7 @@ if __name__ == '__main__':
     # print(i.shape)
     # print(i.dtype)
     print("Time of execution of the NEW version: ", end-start)
+    print("Time to draw disks with NEW version: ", end_disk-start_disk)
 
 """
 Features lost due to optimization of speed:
