@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import torch
 from torchvision import transforms
 from PIL import Image
+import time
 
 
 class PrepData(torch.utils.data.Dataset):
@@ -53,14 +54,17 @@ class PrepData(torch.utils.data.Dataset):
 
 
 if __name__ == '__main__':
+    start = time.time()
     # for i in range(1, 10):
     #     mi, m, i = PrepData()[i]
     mi, m, i = PrepData()[1]
-    # plt.imshow(mi.permute(1, 2, 0))
-    # plt.show()
+    end = time.time()
+    plt.imshow(mi.permute(1, 2, 0))
+    plt.show()
     # print(mi.shape)
     # print(mi.dtype)
     # print(m.shape)
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
+    print("Time of execution of the rectangle version: ", end-start)

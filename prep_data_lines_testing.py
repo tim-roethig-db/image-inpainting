@@ -38,7 +38,9 @@ class PrepData(torch.utils.data.Dataset):
         # Determine how many lines should be defined
         # Can be tweaked:
         maxLines = 25
-        lines = np.random.randint(1, maxLines)
+        # lines = np.random.randint(1, maxLines)
+        # Benchmark:
+        lines = 10
         lines *= 2
         lowRad = 5
         highRad = 16
@@ -97,6 +99,7 @@ if __name__ == '__main__':
     #     mi, m, i = PrepData()[1]
     #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j+1000}.pt'))
     mi, m, i = PrepData()[1]
+    end = time.time()
     plt.imshow(mi.permute(1, 2, 0))
     plt.show()
     # print(mi.shape)
@@ -105,5 +108,4 @@ if __name__ == '__main__':
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
-    end = time.time()
     print("Time of execution of the OLD version: ", end-start)

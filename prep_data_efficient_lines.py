@@ -70,7 +70,7 @@ class PrepData(torch.utils.data.Dataset):
                 all_line_cols = all_line_cols.append(col)
 
         # Decide how big the radius of disks should be        
-        rand = np.random.randint(0, 1000, 100)
+        rand = np.random.randint(0, 1000, len(all_line_rows))
 
         # Draw circles for every line coordinate
         for i in range(len(all_line_rows)):

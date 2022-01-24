@@ -86,6 +86,8 @@ class PrepData(torch.utils.data.Dataset):
                 all_circle_rows = np.append(all_circle_rows, rowCirc)
                 all_circle_cols = np.append(all_circle_cols, colCirc)
 
+        # TODO: find a way to efficiently delete duplicates 
+        # before this operation
         mask[:, all_circle_rows, all_circle_cols] = 0
         
         img = torch.as_tensor(img, dtype=torch.float64)
@@ -99,6 +101,7 @@ if __name__ == '__main__':
     #     mi, m, i = PrepData()[1]
     #     torch.save(m, (os.getcwd() + f'\\masks\\mask_{j+1000}.pt'))
     mi, m, i = PrepData()[1]
+    end = time.time()
     plt.imshow(mi.permute(1, 2, 0))
     plt.show()
     # print(mi.shape)
@@ -107,7 +110,6 @@ if __name__ == '__main__':
     # print(m.dtype)
     # print(i.shape)
     # print(i.dtype)
-    end = time.time()
     print("Time of execution of the NEW version: ", end-start)
 
 """
