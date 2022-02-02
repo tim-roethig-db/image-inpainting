@@ -6,8 +6,8 @@ import torch
 from torchvision import transforms
 from PIL import Image
 # BENCHMARK:
-from tqdm import tqdm
-import time
+# from tqdm import tqdm
+# import time
 
 
 class PrepData(torch.utils.data.Dataset):
@@ -56,14 +56,17 @@ class PrepData(torch.utils.data.Dataset):
 
 if __name__ == '__main__':
     # start = time.time()
-    execution_times = ["REC_exec_time"]
-    for j in tqdm(range(1, 1001)):
-        start = time.time()
-        mi, m, i = PrepData()[1]
-        end = time.time()
-        execution_times.append(end-start)
-    np.savetxt('rectangles_time.csv', execution_times, delimiter=',', fmt='%s')
-    # mi, m, i = PrepData()[1]
+
+    # BENCHMARK:
+    # execution_times = ["REC_exec_time"]
+    # for j in tqdm(range(1, 1001)):
+    #     start = time.time()
+    #     mi, m, i = PrepData()[1]
+    #     end = time.time()
+    #     execution_times.append(end-start)
+    # np.savetxt('rectangles_time.csv', execution_times, delimiter=',', fmt='%s')
+    
+    mi, m, i = PrepData()[1]
     # end = time.time()
     # plt.imshow(mi.permute(1, 2, 0))
     # plt.show()
