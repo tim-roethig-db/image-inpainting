@@ -1,1 +1,3 @@
-data_celeba
+/data_celeba/*
+*.pyc
+/.idea/*
