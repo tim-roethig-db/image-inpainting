@@ -7,20 +7,19 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 4
-    lr = 0.0001
-    epochs = 4
+    batch_size = 6
+    lr = 1e-4
+    epochs = 1
     beta1 = 0.5
     beta2 = 0.999
-    device = torch.device('cpu')
+    device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 10)
+    data_train = PrepData(n_samples=batch_size * 100)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
 
-    #TODO
-    generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=8).double().to(device)
+    generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=2).double().to(device)
     discriminator = Discriminator().double().to(device)
     print("Loaded model to device...")
 
@@ -68,14 +67,17 @@ if __name__ == "__main__":
 
             optimG.zero_grad()
             optimD.zero_grad()
-            sum(losses.values()).backward()
+            # sum(losses.values()).backward()
+            gen_loss.backward()
             losses['dis_loss'] = dis_loss
             dis_loss.backward()
             optimG.step()
             optimD.step()
 
             # logs
-            print(losses)
+            #if (i + 1) % (iters_per_epoch // 10) == 0:
+            #    print(i, ': ', losses)
+            print(i, ': ', losses)
 
     torch.save(generator.state_dict(), 'gan_generator')
     torch.save(discriminator.state_dict(), 'gan_discriminator')
