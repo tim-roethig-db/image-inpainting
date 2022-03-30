@@ -6,18 +6,6 @@ from model import PartialConvNet
 from loss import CalculateLoss
 
 
-class SubsetSampler(data.sampler.Sampler):
-    def __init__(self, start_sample, num_samples):
-        self.num_samples = num_samples
-        self.start_sample = start_sample
-
-    def __iter__(self):
-        return iter(range(self.start_sample, self.num_samples))
-
-    def __len__(self):
-        return self.num_samples
-
-
 def requires_grad(param):
     return param.requires_grad
 
@@ -26,7 +14,7 @@ if __name__ == '__main__':
     batch_size = 4
     lr = 0.1
     epochs = 4
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
     data_train = PrepData(n_samples=batch_size * 10)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
@@ -46,8 +34,7 @@ if __name__ == '__main__':
 
         iterator_train = iter(data.DataLoader(
             data_train,
-            batch_size=batch_size,
-            sampler=SubsetSampler(0, data_train.num_imgs)))
+            batch_size=batch_size,))
 
         # TRAINING LOOP
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")

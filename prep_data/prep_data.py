@@ -51,6 +51,9 @@ class PrepData(torch.utils.data.Dataset):
 
         return (img * mask), mask, img
 
+    def __len__(self):
+        return self.n_samples
+
 
 if __name__ == '__main__':
     mi, m, i = PrepData()[0]
