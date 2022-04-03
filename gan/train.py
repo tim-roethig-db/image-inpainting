@@ -1,5 +1,8 @@
 import torch
 from torch.utils import data
+import sys
+
+sys.path.insert(0, '..')
 
 from prep_data.prep_data import PrepData
 from loss import L1, DLoss
