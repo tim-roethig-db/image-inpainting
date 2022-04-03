@@ -14,7 +14,7 @@ if __name__ == "__main__":
     beta2 = 0.999
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 100)
+    data_train = PrepData(n_samples=batch_size * 10000)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -67,17 +67,17 @@ if __name__ == "__main__":
 
             optimG.zero_grad()
             optimD.zero_grad()
-            # sum(losses.values()).backward()
-            gen_loss.backward()
+            sum(losses.values()).backward()
+            # gen_loss.backward()
             losses['dis_loss'] = dis_loss
             dis_loss.backward()
             optimG.step()
             optimD.step()
 
             # logs
-            #if (i + 1) % (iters_per_epoch // 10) == 0:
-            #    print(i, ': ', losses)
-            print(i, ': ', losses)
+            if (i + 1) % (iters_per_epoch // 10) == 0:
+                print(i, ': ', losses)
+            # print(i, ': ', losses)
 
     torch.save(generator.state_dict(), 'gan_generator')
     torch.save(discriminator.state_dict(), 'gan_discriminator')

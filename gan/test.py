@@ -13,7 +13,7 @@ if __name__ == '__main__':
     model = model.to(device)
     model.eval()
 
-    img, mask, gt_img = PrepData()[5]
+    img, mask, gt_img = PrepData()[3]
     mask = mask[0, :, :]
     mask = mask[None, :, :]
 
