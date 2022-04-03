@@ -7,7 +7,7 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 6
+    batch_size = 16
     lr = 1e-4
     epochs = 1
     beta1 = 0.5
@@ -75,8 +75,8 @@ if __name__ == "__main__":
             optimD.step()
 
             # logs
-            if (i + 1) % (iters_per_epoch // 10) == 0:
-                print(i, ': ', losses)
+            if (i + 1) % 100 == 0:
+                print(i + 1, ':', losses)
             # print(i, ': ', losses)
 
     torch.save(generator.state_dict(), 'gan_generator')
