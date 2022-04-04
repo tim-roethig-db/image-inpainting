@@ -14,9 +14,9 @@ if __name__ == '__main__':
     batch_size = 4
     lr = 0.1
     epochs = 4
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 10)
+    data_train = PrepData(n_samples=10)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
