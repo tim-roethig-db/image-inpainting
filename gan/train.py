@@ -2,22 +2,22 @@ import torch
 from torch.utils import data
 import sys
 
-sys.path.insert(0, '..')
+#sys.path.insert(0, '..')
 
-from prep_data.prep_data import PrepData
+from prep_data import PrepData
 from loss import L1, DLoss
 from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 16
+    batch_size = 24
     lr = 1e-4
     epochs = 1
     beta1 = 0.5
     beta2 = 0.999
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 10000)
+    data_train = PrepData(n_samples=batch_size * 100)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
