@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import torch
 
 from model import PartialConvNet
-from prep_data.prep_data import PrepData
+from prep_data import PrepData
 
 
 if __name__ == '__main__':
     device = torch.device('cpu')
 
     model = PartialConvNet().double()
-    model.load_state_dict(torch.load('pc_model'))
+    model.load_state_dict(torch.load('pc_model', map_location=torch.device('cpu')))
     model = model.to(device)
     model.eval()
 
