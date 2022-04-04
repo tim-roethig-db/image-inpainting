@@ -1,7 +1,7 @@
 import torch
 from torch.utils import data
 
-from prep_data.prep_data import PrepData
+from prep_data import PrepData
 from model import PartialConvNet
 from loss import CalculateLoss
 
