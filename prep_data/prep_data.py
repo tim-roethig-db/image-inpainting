@@ -16,7 +16,9 @@ class PrepData(torch.utils.data.Dataset):
         self.max_patch_size = 0.3
 
         self.img_paths = glob.glob(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data_celeba/*.jpg')
+
         self.img_paths = self.img_paths[:self.n_samples]
+        print(self.img_paths)
         self.num_imgs = len(self.img_paths)
 
         self.img_transformer = transforms.ToTensor()
