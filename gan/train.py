@@ -78,9 +78,9 @@ if __name__ == "__main__":
             optimD.step()
 
             # logs
-            if (i + 1) % 100 == 0:
-                print(i + 1, ':', losses)
-            # print(i, ': ', losses)
+            #if (i + 1) % 100 == 0:
+            #    print(i + 1, ':', losses)
+            print(i, ': ', losses)
 
     torch.save(generator.state_dict(), 'gan_generator')
     torch.save(discriminator.state_dict(), 'gan_discriminator')
