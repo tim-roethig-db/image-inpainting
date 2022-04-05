@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import torch
 
 from model import InpaintGenerator
-from prep_data.prep_data import PrepData
+from prep_data import PrepData
 
 
 if __name__ == '__main__':
     device = torch.device('cpu')
 
     model = InpaintGenerator([1, 2, 4, 8], 2).double()
-    model.load_state_dict(torch.load('gan_generator'))
+    model.load_state_dict(torch.load('gan_generator', map_location=torch.device('cpu')))
     model = model.to(device)
     model.eval()
 

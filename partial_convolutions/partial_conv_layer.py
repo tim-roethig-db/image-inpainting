@@ -3,7 +3,6 @@ import torch.nn as nn
 
 
 class PartialConvLayer(nn.Module):
-
     def __init__(self, in_channels, out_channels, bn=True, bias=False, sample="none-3", activation="relu"):
         super().__init__()
         self.bn = bn
