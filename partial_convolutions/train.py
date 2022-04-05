@@ -11,7 +11,7 @@ def requires_grad(param):
 
 
 if __name__ == '__main__':
-    batch_size = 25
+    batch_size = 24
     lr = 0.01
     epochs = 4
     device = torch.device('cuda')
