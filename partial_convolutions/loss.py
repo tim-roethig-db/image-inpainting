@@ -41,7 +41,7 @@ def style_loss(h_comp, h_out, h_gt, l1):
 # computes TV loss over entire composed image since gradient will not be passed backward to input
 def total_variation_loss(image, l1):
     # shift one pixel and get loss1 difference (for both x and y direction)
-    loss = l1(image[:, :, :, :-1] - image[:, :, :, 1:]) + l1(image[:, :, :-1, :] - image[:, :, 1:, :])
+    loss = l1(image[:, :, :, :-1], image[:, :, :, 1:]) + l1(image[:, :, :-1, :], image[:, :, 1:, :])
     return loss
 
 
@@ -70,18 +70,21 @@ class CalculateLoss(nn.Module):
     def __init__(self):
         super().__init__()
         self.vgg_extract = VGG16Extractor()
-        self.loss = nn.L1Loss()
+        self.l1 = nn.L1Loss()
 
     def forward(self, input_x, mask, output, ground_truth):
         composed_output = (input_x * mask) + (output * (1 - mask))
 
-        s_composed_output = self.vgg_extract(composed_output)
+        fs_composed_output = self.vgg_extract(composed_output)
         fs_output = self.vgg_extract(output)
         fs_ground_truth = self.vgg_extract(ground_truth)
 
         loss_dict = dict()
 
-        loss_dict["hole"] = self.loss((1 - mask) * output, (1 - mask) * ground_truth) * LAMBDAS["hole"]
-        loss_dict["valid"] = self.loss(mask * output, mask * ground_truth) * LAMBDAS["valid"]
+        loss_dict["hole"] = self.l1((1 - mask) * output, (1 - mask) * ground_truth) * LAMBDAS["hole"]
+        loss_dict["valid"] = self.l1(mask * output, mask * ground_truth) * LAMBDAS["valid"]
+        loss_dict["perceptual"] = perceptual_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * LAMBDAS["perceptual"]
+        loss_dict["style"] = style_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * LAMBDAS["style"]
+        loss_dict["tv"] = total_variation_loss(composed_output, self.l1) * LAMBDAS["tv"]
 
         return loss_dict
