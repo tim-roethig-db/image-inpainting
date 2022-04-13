@@ -9,7 +9,7 @@ if __name__ == '__main__':
     device = torch.device('cpu')
 
     model = PartialConvNet().double()
-    model.load_state_dict(torch.load('pc_model_2', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('pc_model', map_location=torch.device('cpu')))
     model = model.to(device)
     model.eval()
 

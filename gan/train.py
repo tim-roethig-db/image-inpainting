@@ -1,23 +1,20 @@
 import torch
 from torch.utils import data
-import sys
-
-#sys.path.insert(0, '..')
 
 from prep_data import PrepData
-from loss import L1, DLoss
+from loss import L1, DLoss, dis_loss, CalculateLoss
 from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 16
+    batch_size = 2
     lr = 1e-4
-    epochs = 1
+    epochs = 2
     beta1 = 0.5
     beta2 = 0.999
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 100)
+    data_train = PrepData(n_samples=batch_size * 4)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -39,9 +36,13 @@ if __name__ == "__main__":
         betas=(beta1, beta2)
     )
     print("Setup Adam optimizer...")
-
+    """
     l1 = L1()
     dloss = DLoss()
+    print("Setup loss function...")
+    """
+    gen_loss_func = CalculateLoss().to(device)
+    dis_loss_func = dis_loss().to(device)
     print("Setup loss function...")
 
     for epoch in range(1, epochs+1):
@@ -62,17 +63,20 @@ if __name__ == "__main__":
 
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
-
+            """
             losses = {}
             losses['l1'] = l1(pred_img, gt)
             dis_loss, gen_loss = dloss(discriminator, comp_img, gt)
             losses['gen_loss'] = gen_loss
+            """
+            loss_dict = gen_loss_func(image, mask, pred_img, gt, discriminator)
+            dis_loss = dis_loss_func(discriminator, comp_img, gt)
 
             optimG.zero_grad()
             optimD.zero_grad()
-            sum(losses.values()).backward()
+            sum(loss_dict.values()).backward()
             # gen_loss.backward()
-            losses['dis_loss'] = dis_loss
+            loss_dict['dis_loss'] = dis_loss
             dis_loss.backward()
             optimG.step()
             optimD.step()
@@ -80,7 +84,7 @@ if __name__ == "__main__":
             # logs
             #if (i + 1) % 100 == 0:
             #    print(i + 1, ':', losses)
-            print(i, ': ', losses)
+            print(i, ': ', loss_dict)
 
     torch.save(generator.state_dict(), 'gan_generator')
     torch.save(discriminator.state_dict(), 'gan_discriminator')
