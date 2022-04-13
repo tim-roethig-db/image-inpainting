@@ -12,7 +12,7 @@ if __name__ == "__main__":
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
-    device = torch.device('cpu')
+    device = torch.device('cuda')
 
     data_train = PrepData(n_samples=batch_size * 1000)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
