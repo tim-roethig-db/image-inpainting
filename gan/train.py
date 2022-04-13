@@ -41,6 +41,7 @@ if __name__ == "__main__":
     dloss = DLoss()
     print("Setup loss function...")
     """
+    l1 = L1()
     gen_loss_func = CalculateLoss().to(device)
     dis_loss_func = dis_loss().to(device)
     print("Setup loss function...")
@@ -65,7 +66,7 @@ if __name__ == "__main__":
             comp_img = (1 - mask) * gt + mask * pred_img
             """
             losses = {}
-            losses['l1'] = l1(pred_img, gt)
+            losses['l1'] = l1(comp_img, gt)
             dis_loss, gen_loss = dloss(discriminator, comp_img, gt)
             losses['gen_loss'] = gen_loss
             """
@@ -84,7 +85,7 @@ if __name__ == "__main__":
             # logs
             #if (i + 1) % 100 == 0:
             #    print(i + 1, ':', losses)
-            print(i, ': ', loss_dict)
+            print(f"{i} l1: {l1(comp_img, gt)}, gen_los: {loss_dict['gen_loss']}, dis_loss: {loss_dict['dis_loss']}")
 
     torch.save(generator.state_dict(), 'gan_generator')
     torch.save(discriminator.state_dict(), 'gan_discriminator')
