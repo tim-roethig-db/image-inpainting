@@ -11,12 +11,12 @@ def requires_grad(param):
 
 
 if __name__ == '__main__':
-    batch_size = 16
+    batch_size = 2
     lr = 0.01
     epochs = 4
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 1000)
+    data_train = PrepData(n_samples=batch_size * 10)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -27,19 +27,21 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(filter(requires_grad, model.parameters()), lr=lr)
     print("Setup Adam optimizer...")
 
+    l1 = torch.nn.L1Loss()
     loss_func = CalculateLoss().to(device)
     print("Setup loss function...")
 
-    for epoch in range(1, epochs+1):
+    for epoch in range(1, epochs + 1):
 
         iterator_train = iter(data.DataLoader(
             data_train,
-            batch_size=batch_size,))
+            batch_size=batch_size, ))
 
         # TRAINING LOOP
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")
 
-        for i in range(0, iters_per_epoch):
+        monitor_loss = 0
+        for i in range(1, iters_per_epoch + 1):
             # Sets model to train mode
             model.train()
 
@@ -48,20 +50,24 @@ if __name__ == '__main__':
 
             # Forward-propagates images through net
             # Mask is also propagated, though it is usually gone by the decoding stage
-            output = model(image, mask)
+            pred_img = model(image, mask)
+            comp_img = (1 - mask) * gt + mask * pred_img
 
-            loss_dict = loss_func(image, mask, output, gt)
-            loss = 0.0
-            # sums up each loss value
-            for key, value in loss_dict.items():
-                loss += value
-            print(loss)
+            loss_dict = loss_func(image, mask, pred_img, gt)
 
             # Resets gradient accumulator in optimizer
             optimizer.zero_grad()
             # back-propogates gradients through model weights
-            loss.backward()
+            sum(loss_dict.values()).backward()
             # updates the weights
             optimizer.step()
+
+            j = 5
+            if i % j == 0:
+                monitor_loss = monitor_loss / j
+                print(f"{i} l1: {monitor_loss}")
+                monitor_loss = 0
+            else:
+                monitor_loss += l1(comp_img, gt)
 
     torch.save(model.state_dict(), 'pc_model')

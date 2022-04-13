@@ -1,36 +1,8 @@
 import torch
 import torch.nn as nn
-
-
-class L1:
-    def __init__(self):
-        self.calc = nn.L1Loss()
-
-    def __call__(self, x, y):
-        return self.calc(x, y)
-
-
-class DLoss:
-    def __init__(self, ):
-        self.loss_fn = torch.nn.Softplus()
-
-    def __call__(self, netD, fake, real):
-        fake_detach = fake.detach()
-        d_fake = netD(fake_detach)
-        d_real = netD(real)
-        dis_loss = self.loss_fn(-d_real).mean() + self.loss_fn(d_fake).mean()
-
-        g_fake = netD(fake)
-        gen_loss = self.loss_fn(-g_fake).mean()
-
-        return dis_loss, gen_loss
-
-
-import torch
-import torch.nn as nn
 from torchvision import models
 
-LAMBDAS = {"valid": 1.0, "hole": 6.0, "tv": 2.0, "perceptual": 0.05, "style": 240.0, "dloss": 1.0}
+LAMBDAS = {"valid": 1.0, "hole": 6.0, "tv": 2.0, "perceptual": 0.05, "style": 240.0, "dis_loss": 1.0}
 
 
 def gram_matrix(feature_matrix):
@@ -123,8 +95,7 @@ class CalculateLoss(nn.Module):
         loss_dict["valid"] = self.l1(mask * output, mask * ground_truth) * LAMBDAS["valid"]
         loss_dict["perceptual"] = perceptual_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * LAMBDAS["perceptual"]
         loss_dict["style"] = style_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * LAMBDAS["style"]
-        loss_dict["tv"] = total_variation_loss(composed_output, self.l1) * LAMBDAS["tv"]
-        loss_dict["gen_loss"] = gen_loss(netD, composed_output)
+        loss_dict["gen_loss"] = gen_loss(netD, composed_output) * LAMBDAS['dis_loss']
 
         return loss_dict
 
