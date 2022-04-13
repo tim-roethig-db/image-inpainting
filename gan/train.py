@@ -7,7 +7,7 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 15
+    batch_size = 12
     lr = 1e-4
     epochs = 2
     beta1 = 0.5
