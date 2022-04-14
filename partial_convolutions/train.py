@@ -43,7 +43,7 @@ if __name__ == '__main__':
         monitor_loss = 0
         for i in range(1, iters_per_epoch + 1):
             # Sets model to train mode
-            model.train()
+            #model.train()
 
             # Gets the next batch of images
             image, mask, gt = [x.to(device) for x in next(iterator_train)]
@@ -65,7 +65,7 @@ if __name__ == '__main__':
             j = 5
             if i % j == 0:
                 monitor_loss = monitor_loss / j
-                print(f"{i} l1: {monitor_loss}")
+                print(f"{i} l1: {round(monitor_loss.item(), 4)}")
                 monitor_loss = 0
             else:
                 monitor_loss += l1(comp_img, gt)

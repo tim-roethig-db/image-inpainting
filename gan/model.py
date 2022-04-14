@@ -117,7 +117,6 @@ class Discriminator(nn.Module):
         return feat
 
 
-
 class PartialConvNet(nn.Module):
     # 256 x 256 image input, 256 = 2^8
     def __init__(self, input_size=256, layers=7):
