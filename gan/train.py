@@ -3,8 +3,7 @@ from torch.utils import data
 
 from prep_data import PrepData
 from loss import dis_loss, CalculateLoss
-from model import InpaintGenerator, Discriminator
-from partial_convolutions.model import PartialConvNet
+from model import InpaintGenerator, Discriminator, PartialConvNet
 
 
 if __name__ == "__main__":
