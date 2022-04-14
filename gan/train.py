@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 monitor_l1_loss = monitor_l1_loss / j
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
-                print(f"{i} l1: {monitor_l1_loss}, gen_los: {monitor_gen_loss}, dis_loss: {monitor_dis_loss}")
+                print(f"{i} l1: {monitor_l1_loss.round(4)}, gen_los: {monitor_gen_loss.round(4)}, dis_loss: {monitor_dis_loss.round(4)}")
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0
