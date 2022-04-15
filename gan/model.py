@@ -98,7 +98,7 @@ class AOTBlock(nn.Module):
 class Discriminator(nn.Module):
     def __init__(self):
         super(Discriminator, self).__init__()
-        inc = 3
+        inc = 1
         self.conv = nn.Sequential(
             spectral_norm(nn.Conv2d(inc, 64, 4, stride=2, padding=1, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
