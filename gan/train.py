@@ -7,7 +7,7 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 
 if __name__ == "__main__":
-    batch_size = 15
+    batch_size = 14
     lr = 0.01 #1e-4
     epochs = 2
     beta1 = 0.5
