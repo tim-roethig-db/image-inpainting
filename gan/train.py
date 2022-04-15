@@ -7,14 +7,14 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 
 if __name__ == "__main__":
-    batch_size = 13
+    batch_size = 16
     lr = 0.01 #1e-4
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 100)
+    data_train = PrepData(n_samples=batch_size * 5000)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
