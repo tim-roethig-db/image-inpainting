@@ -8,7 +8,7 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 if __name__ == "__main__":
     batch_size = 12
-    lr = 1e-4
+    lr = 0.01 #1e-4
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 monitor_l1_loss = monitor_l1_loss / j
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
-                print(f"{i}l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}")
+                print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}")
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0
