@@ -8,7 +8,7 @@ from PIL import Image
 
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples=100):
+    def __init__(self, n_samples=1000):
         super().__init__()
 
         self.n_samples = n_samples
