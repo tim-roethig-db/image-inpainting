@@ -50,6 +50,8 @@ class InpaintGenerator(nn.Module):
         self.decoder.apply(init_weights)
 
     def forward(self, x, mask):
+        #mask = mask[:, 0, :, :]
+        #mask = mask[:, None, :, :]
         #x = torch.cat([x, mask], dim=1)
         x = x * mask
         #print(x.shape)
