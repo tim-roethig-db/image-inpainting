@@ -28,7 +28,7 @@ class InpaintGenerator(nn.Module):
 
         self.encoder = nn.Sequential(
             nn.ReflectionPad2d(3),
-            nn.Conv2d(3, 64, 7),
+            nn.Conv2d(4, 64, 7),
             nn.ReLU(True),
             nn.Conv2d(64, 128, 4, stride=2, padding=1),
             nn.ReLU(True),
@@ -50,10 +50,10 @@ class InpaintGenerator(nn.Module):
         self.decoder.apply(init_weights)
 
     def forward(self, x, mask):
-        #mask = mask[:, 0, :, :]
-        #mask = mask[:, None, :, :]
-        #x = torch.cat([x, mask], dim=1)
-        x = x * mask
+        mask = mask[:, 0, :, :]
+        mask = mask[:, None, :, :]
+        x = torch.cat([x, mask], dim=1)
+        #x = x * mask
         #print(x.shape)
         x = self.encoder(x)
         x = self.middle(x)
