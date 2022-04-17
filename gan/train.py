@@ -1,5 +1,6 @@
 import torch
 from torch.utils import data
+import pandas as pd
 
 from prep_data import PrepData
 from loss import dis_loss, CalculateLoss
@@ -14,7 +15,7 @@ if __name__ == "__main__":
     beta2 = 0.999
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 100)
+    data_train = PrepData(n_samples=batch_size * 10)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -43,8 +44,8 @@ if __name__ == "__main__":
     dis_loss_func = dis_loss().to(device)
     print("Setup loss function...")
 
+    loss_df = list()
     for epoch in range(1, epochs+1):
-
         iterator_train = iter(data.DataLoader(
             data_train,
             batch_size=batch_size,
@@ -80,6 +81,7 @@ if __name__ == "__main__":
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
                 print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}")
+                loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item()])
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0
@@ -87,6 +89,9 @@ if __name__ == "__main__":
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
                 monitor_dis_loss += dis_loss
+
+    loss_df = pd.DataFrame(columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss'])
+    loss_df.to_csv('losses.csv', index=False)
 
     torch.save(generator.state_dict(), 'gan_generator')
     torch.save(discriminator.state_dict(), 'gan_discriminator')
