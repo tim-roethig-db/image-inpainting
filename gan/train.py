@@ -90,7 +90,10 @@ if __name__ == "__main__":
                 monitor_gen_loss += loss_dict['gen_loss']
                 monitor_dis_loss += dis_loss
 
-    loss_df = pd.DataFrame(columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss'])
+    loss_df = pd.DataFrame(
+        columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss'],
+        data=loss_df
+    )
     loss_df.to_csv('losses.csv', index=False)
 
     torch.save(generator.state_dict(), 'gan_generator')
