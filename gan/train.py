@@ -15,7 +15,7 @@ if __name__ == "__main__":
     beta2 = 0.999
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 20)
+    data_train = PrepData(n_samples=batch_size * 200)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     optimD = torch.optim.Adam(
         discriminator.parameters(),
-        lr=0.0001,
+        lr=lr,
         betas=(beta1, beta2)
     )
     print("Setup Adam optimizer...")
