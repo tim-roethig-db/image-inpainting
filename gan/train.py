@@ -15,13 +15,13 @@ if __name__ == "__main__":
     beta2 = 0.999
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 10)
+    data_train = PrepData(n_samples=batch_size * 20)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
 
-    generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=2).double().to(device)
-    #generator = PartialConvNet().double().to(device)
+    #generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=2).double().to(device)
+    generator = PartialConvNet().double().to(device)
     discriminator = Discriminator().double().to(device)
     print("Loaded model to device...")
 
@@ -77,6 +77,9 @@ if __name__ == "__main__":
 
             j = 5
             if i % j == 0:
+                monitor_l1_loss += l1(comp_img, gt)
+                monitor_gen_loss += loss_dict['gen_loss']
+                monitor_dis_loss += dis_loss
                 monitor_l1_loss = monitor_l1_loss / j
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j

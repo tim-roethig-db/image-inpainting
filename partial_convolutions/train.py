@@ -1,5 +1,6 @@
 import torch
 from torch.utils import data
+import pandas as pd
 
 from prep_data import PrepData
 from model import PartialConvNet
@@ -13,10 +14,10 @@ def requires_grad(param):
 if __name__ == '__main__':
     batch_size = 16
     lr = 0.01
-    epochs = 4
+    epochs = 1
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 100)
+    data_train = PrepData(n_samples=batch_size * 20)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -31,8 +32,8 @@ if __name__ == '__main__':
     loss_func = CalculateLoss().to(device)
     print("Setup loss function...")
 
+    loss_df = list()
     for epoch in range(1, epochs + 1):
-
         iterator_train = iter(data.DataLoader(
             data_train,
             batch_size=batch_size, ))
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         # TRAINING LOOP
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")
 
-        monitor_loss = 0
+        monitor_l1_loss = 0
         for i in range(1, iters_per_epoch + 1):
             # Sets model to train mode
             #model.train()
@@ -64,10 +65,18 @@ if __name__ == '__main__':
 
             j = 5
             if i % j == 0:
-                monitor_loss = monitor_loss / j
-                print(f"{i} l1: {round(monitor_loss.item(), 4)}")
-                monitor_loss = 0
+                monitor_l1_loss += l1(comp_img, gt)
+                monitor_l1_loss = monitor_l1_loss / j
+                print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}")
+                loss_df.append([epoch, i, monitor_l1_loss.item()])
+                monitor_l1_loss = 0
             else:
-                monitor_loss += l1(comp_img, gt)
+                monitor_l1_loss += l1(comp_img, gt)
+
+        loss_df = pd.DataFrame(
+            columns=['epoch', 'iteration', 'l1'],
+            data=loss_df
+        )
+        loss_df.to_csv('losses.csv', index=False)
 
     torch.save(model.state_dict(), 'pc_model')
