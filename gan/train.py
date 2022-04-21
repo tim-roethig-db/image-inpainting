@@ -20,8 +20,8 @@ if __name__ == "__main__":
 
     iters_per_epoch = data_train.num_imgs // batch_size
 
-    #generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=2).double().to(device)
-    generator = PartialConvNet().double().to(device)
+    generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=2).double().to(device)
+    #generator = PartialConvNet().double().to(device)
     discriminator = Discriminator().double().to(device)
     print("Loaded model to device...")
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     optimD = torch.optim.Adam(
         discriminator.parameters(),
-        lr=lr,
+        lr=0.0001,
         betas=(beta1, beta2)
     )
     print("Setup Adam optimizer...")
