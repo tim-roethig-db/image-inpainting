@@ -1,0 +1,63 @@
+job.495268_emptyCache:
+Deleting the Cache in the end of the for loop of train.py 
+has no effect on OOM errors for settings batch_size=16, 
+sample_size=batch_size*10, epochs=100
+
+job.495275_sampleSize:
+Trying sample_size=16*1000 and 2 epochs and allocated 20GB 
+RAM per CPU. Ran without erros. Took 5-6 hours. 
+Result looks a bit better.
+Next time try batch_size=32.
+But before that make mask algorithm more efficient.
+
+Noticed that n_samples was still set in __init__ method of 
+prep_data_irregular and prep_data. Maybe thats why there were
+no OOM errors lately? But no, it was set the whole time, also
+during the OOM erros.
+
+Job...:
+Line algo still not efficient, so just try rectangles!
+batch_size=32  *1000, epochs=2.
+Note: I changed position of empty cache method 
+(now for every epoch instead of every iteration per epoch)
+-> OOM errors
+
+job.497396_rectangles:
+Trained on rectangle masks.
+batch_size=16  *10000, epochs=5.
+Took longer thatn 20h so time out.
+
+job.499898_rectangles:
+Trained on rectangle masks.
+batch_size=16  sample_size=batch_size*1000, epochs=20.
+Timeout. Completed only 13 epochs.
+Test on rectangles: test_epoch13_rectangle.png 
+does not look that great.
+Test on lines: test_epoch13_lines.png
+looks even worse, but maybe the eye is better.
+On out file, loss looked pretty good on epoch 13 ~ 0.01
+But it wasn´t significantly improving since epoch 11 started.
+And before that loss lowered only by ~0.02 since epoch 6.
+
+job.500547_rectangles:
+batch_size=16  sample_size=batch_size*10000, epochs=13.
+Week job.
+Error:
+    image, mask, gt = [x.to(device) for x in next(iterator_train)]
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+job.501142_rectangles:
+batch_size=16  sample_size=batch_size*10000, epochs=13.
+Pulled emptyCache method in iterations per epoch loop.
+No output in out file??? Timeout after one week...
+Way to slow with emptyCache for every iteration of an epoch (3-5s call time).
+So try and leave it out. 
+
+job.500547_rectangles and job.501142_rectangles results:
+test_rectangles_bs10000_*
+
+job 502349:
+batch_size=16  sample_size=batch_size*10000, epochs=13.
+EmptyCache commented out.

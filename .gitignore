@@ -1,6 +1,10 @@
-data/data_celeba/*
+data/*
 *.pyc
 /.idea/*
 *.jpg
+*.t7
+test*
+*.out
+*.err
 *.zip
-exp/*
+*.ipynb
