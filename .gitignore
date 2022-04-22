@@ -1,3 +1,6 @@
-/data_celeba/*
+data/data_celeba/*
 *.pyc
 /.idea/*
+*.jpg
+*.zip
+exp/*
