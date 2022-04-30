@@ -12,12 +12,12 @@ def requires_grad(param):
 
 
 if __name__ == '__main__':
-    batch_size = 16
+    batch_size = 2
     lr = 0.01
     epochs = 1
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 20)
+    data_train = PrepData(n_samples=batch_size * 2)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -63,7 +63,7 @@ if __name__ == '__main__':
             # updates the weights
             optimizer.step()
 
-            j = 5
+            j = 1
             if i % j == 0:
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_l1_loss = monitor_l1_loss / j

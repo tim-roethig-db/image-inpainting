@@ -8,14 +8,14 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 
 if __name__ == "__main__":
-    batch_size = 12#14
+    batch_size = 2#14
     lr = 0.0001
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
     device = torch.device('cuda')
 
-    data_train = PrepData(n_samples=batch_size * 200)
+    data_train = PrepData(n_samples=batch_size * 2)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
@@ -75,7 +75,7 @@ if __name__ == "__main__":
             optimG.step()
             optimD.step()
 
-            j = 5
+            j = 1
             if i % j == 0:
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']

@@ -5,10 +5,11 @@ import torch.nn.functional as F
 
 class PartialConvNet(nn.Module):
     # 256 x 256 image input, 256 = 2^8
-    def __init__(self, input_size=256, layers=7):
+    def __init__(self, input_size=256, layers=4):
+        """
         if 2 ** (layers + 1) != input_size:
             raise AssertionError
-
+        """
         super().__init__()
         self.freeze_enc_bn = False
         self.layers = layers
@@ -25,7 +26,7 @@ class PartialConvNet(nn.Module):
 
         # 256x32x32 --> 512x16x16
         self.encoder_4 = PartialConvLayer(256, 512, sample="down-3")
-
+        """
         # 512x16x16 --> 512x8x8 --> 512x4x4 --> 512x2x2
         for i in range(5, layers + 1):
             name = "encoder_{:d}".format(i)
@@ -38,7 +39,7 @@ class PartialConvNet(nn.Module):
         for i in range(5, layers + 1):
             name = "decoder_{:d}".format(i)
             setattr(self, name, PartialConvLayer(512 + 512, 512, activation="leaky_relu"))
-
+        """
         # UP(512x16x16) + 256x32x32(enc_3 output) = 768x32x32 --> 256x32x32
         self.decoder_4 = PartialConvLayer(512 + 256, 256, activation="leaky_relu")
 
