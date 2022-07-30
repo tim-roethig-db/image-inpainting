@@ -96,7 +96,6 @@ if __name__ == "__main__":
                 monitor_l1_loss = monitor_l1_loss / j
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
-                print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}")
 
                 image, mask, ground_truth = [], [], []
                 for k in range(test_size):
@@ -117,6 +116,8 @@ if __name__ == "__main__":
 
                 comp_img = (1 - mask) * ground_truth + mask * pred_img
                 l1_loss = l1(comp_img, ground_truth).item()
+                print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}, l1_test: {round(l1_loss, 4)}")
+
                 loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item(), l1_loss])
 
                 monitor_l1_loss = 0
