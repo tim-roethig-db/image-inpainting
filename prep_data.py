@@ -1,4 +1,3 @@
-import os
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,19 +7,16 @@ from PIL import Image
 
 
 class PrepData(torch.utils.data.Dataset):
-    def __init__(self, n_samples=100):
+    def __init__(self, n_samples=1000):
         super().__init__()
 
         self.n_samples = n_samples
         self.min_patch_size = 0.2
         self.max_patch_size = 0.3
-        print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data_celeba/*.jpg')
-        #self.img_paths = glob.glob(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data_celeba/*.jpg')
-        self.img_paths = glob.glob('/home/n1124578/Image-Inpainting/data_celeba/*.jpg')
-        #self.img_paths = glob.glob('/Users/tim/Desktop/Master/Semester_3/ML_PRAK/Image-Inpainting/data_celeba/*.jpg')
 
+        self.img_paths = glob.glob('data_celeba/*.jpg')
         self.img_paths = self.img_paths[:self.n_samples]
-        print(self.img_paths)
+
         self.num_imgs = len(self.img_paths)
 
         self.img_transformer = transforms.ToTensor()

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torchvision import models
 
-LAMBDAS = {"valid": 1.0, "hole": 1.0, "tv": 0, "perceptual": 1, "style": 1.0, "gen_loss": 1.0}
+LAMBDAS = {"valid": 1.0, "hole": 1.0, "tv": 1.0, "perceptual": 1.0, "style": 1.0, "gen_loss": 1.0}
 
 
 def gram_matrix(feature_matrix):
@@ -82,7 +82,7 @@ class CalculateLoss(nn.Module):
         self.vgg_extract = VGG16Extractor()
         self.l1 = nn.L1Loss()
 
-    def forward(self, input_x, mask, output, ground_truth, netD):
+    def forward(self, weights, input_x, mask, output, ground_truth, netD=None):
         composed_output = (input_x * mask) + (output * (1 - mask))
 
         fs_composed_output = self.vgg_extract(composed_output)
@@ -91,12 +91,18 @@ class CalculateLoss(nn.Module):
 
         loss_dict = dict()
 
-        loss_dict["hole"] = self.l1((1 - mask) * output, (1 - mask) * ground_truth) * LAMBDAS["hole"]
-        loss_dict["valid"] = self.l1(mask * output, mask * ground_truth) * LAMBDAS["valid"]
-        loss_dict["perceptual"] = perceptual_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * LAMBDAS["perceptual"]
-        loss_dict["style"] = style_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * LAMBDAS["style"]
-        loss_dict["tv"] = total_variation_loss(composed_output, self.l1) * LAMBDAS["tv"]
-        loss_dict["gen_loss"] = gen_loss(netD, composed_output) * LAMBDAS['gen_loss']
+        if weights["hole"] is not None:
+            loss_dict["hole"] = self.l1((1 - mask) * output, (1 - mask) * ground_truth) * weights["hole"]
+        if weights["valid"] is not None:
+            loss_dict["valid"] = self.l1(mask * output, mask * ground_truth) * weights["valid"]
+        if weights["perceptual"] is not None:
+            loss_dict["perceptual"] = perceptual_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * weights["perceptual"]
+        if weights["style"] is not None:
+            loss_dict["style"] = style_loss(fs_composed_output, fs_output, fs_ground_truth, self.l1) * weights["style"]
+        if weights["tv"] is not None:
+            loss_dict["tv"] = total_variation_loss(composed_output, self.l1) * weights["tv"]
+        if weights["gen_loss"] is not None:
+            loss_dict["gen_loss"] = gen_loss(netD, composed_output) * weights['gen_loss']
 
         return loss_dict
 

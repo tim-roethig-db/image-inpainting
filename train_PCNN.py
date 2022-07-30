@@ -15,20 +15,28 @@ if __name__ == '__main__':
     batch_size = 2
     lr = 0.01
     epochs = 1
-    device = torch.device('cpu')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=batch_size * 2)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
 
-    model = PartialConvNet().double().to(device)
+    model = PartialConvNet().double()
+    model = torch.nn.DataParallel(model)
+    model = model.to(device)
     print("Loaded model to device...")
+
+    pytorch_total_params = sum(
+        p.numel() for p in model.parameters() if p.requires_grad
+    )
+    print("Trainable model parameters:", pytorch_total_params)
 
     optimizer = torch.optim.Adam(filter(requires_grad, model.parameters()), lr=lr)
     print("Setup Adam optimizer...")
 
     l1 = torch.nn.L1Loss()
+    loss_weights = {"valid": 1.0, "hole": 10.0, "tv": 5.0, "perceptual": 0.1, "style": 50.0, "gen_loss": None}
     loss_func = CalculateLoss().to(device)
     print("Setup loss function...")
 
@@ -54,7 +62,7 @@ if __name__ == '__main__':
             pred_img = model(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
 
-            loss_dict = loss_func(image, mask, pred_img, gt)
+            loss_dict = loss_func(loss_weights, image, mask, pred_img, gt)
 
             # Resets gradient accumulator in optimizer
             optimizer.zero_grad()
@@ -73,10 +81,11 @@ if __name__ == '__main__':
             else:
                 monitor_l1_loss += l1(comp_img, gt)
 
-        loss_df = pd.DataFrame(
-            columns=['epoch', 'iteration', 'l1'],
-            data=loss_df
-        )
-        loss_df.to_csv('losses.csv', index=False)
+    loss_df = pd.DataFrame(
+        columns=['epoch', 'iteration', 'l1'],
+        data=loss_df
+    )
+    loss_df.to_csv(f"pcnn_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.csv", index=False, sep=';')
 
-    torch.save(model.state_dict(), 'pc_model')
+    torch.save(model.state_dict(), f"pcnn_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.t7")
+

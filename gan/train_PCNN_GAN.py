@@ -8,22 +8,32 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 
 if __name__ == "__main__":
-    batch_size = 2#14
-    lr = 0.0001
+    batch_size = 2
+    lr = 0.0001 #0.01 für PCNN GAN
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
-    device = torch.device('cuda')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=batch_size * 2)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
     iters_per_epoch = data_train.num_imgs // batch_size
 
-    generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=2).double().to(device)
-    #generator = PartialConvNet().double().to(device)
-    discriminator = Discriminator().double().to(device)
+    generator = PartialConvNet().double()
+    generator = torch.nn.DataParallel(generator)
+    generator = generator.to(device)
+    discriminator = Discriminator().double()
+    discriminator = torch.nn.DataParallel(discriminator)
+    discriminator = discriminator.to(device)
     print("Loaded model to device...")
+
+    pytorch_total_params = sum(
+        p.numel() for p in generator.parameters() if p.requires_grad
+    ) + sum(
+        p.numel() for p in discriminator.parameters() if p.requires_grad
+    )
+    print("Trainable model parameters:", pytorch_total_params)
 
     # möglicherweise filter nötig
     optimG = torch.optim.Adam(
@@ -97,7 +107,7 @@ if __name__ == "__main__":
         columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss'],
         data=loss_df
     )
-    loss_df.to_csv('losses.csv', index=False)
+    loss_df.to_csv(f"pcnn_gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.csv", index=False, sep=';')
 
-    torch.save(generator.state_dict(), 'gan_generator')
-    torch.save(discriminator.state_dict(), 'gan_discriminator')
+    torch.save(generator.state_dict(), f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.t7")
+    torch.save(discriminator.state_dict(), f"gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.t7")
