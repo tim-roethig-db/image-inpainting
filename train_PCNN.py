@@ -15,12 +15,14 @@ if __name__ == '__main__':
     batch_size = 2
     lr = 0.01
     epochs = 1
+    n_samples = 10
+    test_size = 2
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 2)
+    data_train = PrepData(n_samples=n_samples)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
-    iters_per_epoch = data_train.num_imgs // batch_size
+    iters_per_epoch = (data_train.num_imgs - test_size) // batch_size
 
     model = PartialConvNet().double()
     model = torch.nn.DataParallel(model)
@@ -76,13 +78,34 @@ if __name__ == '__main__':
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_l1_loss = monitor_l1_loss / j
                 print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}")
-                loss_df.append([epoch, i, monitor_l1_loss.item()])
+
+                image, mask, ground_truth = [], [], []
+                for k in range(test_size):
+                    im, m, gt = [x.to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                    im, m, gt = im[None, :, :, :], m[None, :, :, :], gt[None, :, :, :]
+                    image.append(im)
+                    mask.append(m)
+                    ground_truth.append(gt)
+
+                image = torch.cat(image)
+                mask = torch.cat(mask)
+                ground_truth = torch.cat(ground_truth)
+
+                model.eval()
+                with torch.no_grad():
+                    pred_img = model(image, mask)
+                model.train()
+
+                comp_img = (1 - mask) * ground_truth + mask * pred_img
+                l1_loss = l1(comp_img, ground_truth).item()
+                loss_df.append([epoch, i, monitor_l1_loss.item(), l1_loss])
+
                 monitor_l1_loss = 0
             else:
                 monitor_l1_loss += l1(comp_img, gt)
 
     loss_df = pd.DataFrame(
-        columns=['epoch', 'iteration', 'l1'],
+        columns=['epoch', 'iteration', 'l1', 'l1_test'],
         data=loss_df
     )
     loss_df.to_csv(f"pcnn_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.csv", index=False, sep=';')

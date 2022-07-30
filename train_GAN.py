@@ -14,14 +14,14 @@ if __name__ == "__main__":
     block_num = 1
     beta1 = 0.5
     beta2 = 0.999
+    n_samples = 10
+    test_size = 2
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    data_train = PrepData(n_samples=200000)
-    data_sampler = data.BatchSampler(data_train, batch_size=1000, drop_last=False)
-    print(data_train.num_imgs)
+    data_train = PrepData(n_samples=n_samples)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
-    iters_per_epoch = 2 #190000 // batch_size
+    iters_per_epoch = (data_train.num_imgs - test_size) // batch_size
 
     generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=block_num).double()
     generator = torch.nn.DataParallel(generator)
@@ -99,10 +99,9 @@ if __name__ == "__main__":
                 monitor_dis_loss = monitor_dis_loss / j
                 print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}")
 
-                test_size = 10
                 image, mask, ground_truth = [], [], []
                 for k in range(test_size):
-                    im, m, gt = [x.to(device) for x in data_train[9000 + k]]
+                    im, m, gt = [x.to(device) for x in data_train[data_train.num_imgs - test_size + k]]
                     im, m, gt = im[None, :, :, :], m[None, :, :, :], gt[None, :, :, :]
                     image.append(im)
                     mask.append(m)
@@ -112,7 +111,6 @@ if __name__ == "__main__":
                 mask = torch.cat(mask)
                 ground_truth = torch.cat(ground_truth)
 
-                print(image.size())
                 generator.eval()
                 with torch.no_grad():
                     pred_img = generator(image, mask)
@@ -121,6 +119,7 @@ if __name__ == "__main__":
                 comp_img = (1 - mask) * ground_truth + mask * pred_img
                 l1_loss = l1(comp_img, ground_truth).item()
                 loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item(), l1_loss])
+
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0

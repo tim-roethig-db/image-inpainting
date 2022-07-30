@@ -13,12 +13,14 @@ if __name__ == "__main__":
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
+    n_samples = 10
+    test_size = 2
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    data_train = PrepData(n_samples=batch_size * 2)
+    data_train = PrepData(n_samples=n_samples)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
-    iters_per_epoch = data_train.num_imgs // batch_size
+    iters_per_epoch = (data_train.num_imgs - test_size) // batch_size
 
     generator = PartialConvNet().double()
     generator = torch.nn.DataParallel(generator)
@@ -76,7 +78,6 @@ if __name__ == "__main__":
             comp_img = (1 - mask) * gt + mask * pred_img
 
             loss_dict = gen_loss_func(loss_weights, image, mask, pred_img, gt, discriminator)
-            print(loss_dict)
             dis_loss = dis_loss_func(discriminator, comp_img, gt)
 
             optimG.zero_grad()
@@ -96,7 +97,28 @@ if __name__ == "__main__":
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
                 print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}")
-                loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item()])
+
+                image, mask, ground_truth = [], [], []
+                for k in range(test_size):
+                    im, m, gt = [x.to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                    im, m, gt = im[None, :, :, :], m[None, :, :, :], gt[None, :, :, :]
+                    image.append(im)
+                    mask.append(m)
+                    ground_truth.append(gt)
+
+                image = torch.cat(image)
+                mask = torch.cat(mask)
+                ground_truth = torch.cat(ground_truth)
+
+                generator.eval()
+                with torch.no_grad():
+                    pred_img = generator(image, mask)
+                generator.train()
+
+                comp_img = (1 - mask) * ground_truth + mask * pred_img
+                l1_loss = l1(comp_img, ground_truth).item()
+                loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item(), l1_loss])
+
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0
@@ -106,7 +128,7 @@ if __name__ == "__main__":
                 monitor_dis_loss += dis_loss
 
     loss_df = pd.DataFrame(
-        columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss'],
+        columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss', 'l1_test'],
         data=loss_df
     )
     loss_df.to_csv(f"pcnn_gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.csv", index=False, sep=';')
