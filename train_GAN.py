@@ -12,8 +12,6 @@ if __name__ == "__main__":
     lr = 0.0001 #0.01 für PCNN GAN
     epochs = 2
     block_num = 1
-    beta1 = 0.5
-    beta2 = 0.999
     n_samples = 10
     test_size = 2
     j = 1
@@ -43,13 +41,11 @@ if __name__ == "__main__":
     optimG = torch.optim.Adam(
         generator.parameters(),
         lr=lr,
-        betas=(beta1, beta2)
     )
 
     optimD = torch.optim.Adam(
         discriminator.parameters(),
         lr=lr,
-        betas=(beta1, beta2)
     )
     print("Setup Adam optimizer...")
 
