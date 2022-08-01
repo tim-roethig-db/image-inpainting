@@ -9,7 +9,7 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 if __name__ == "__main__":
     batch_size = 2
-    lr = 0.0001 #0.01 für PCNN GAN
+    lr = 0.01 #0.01 für PCNN GAN
     epochs = 2
     beta1 = 0.5
     beta2 = 0.999
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
             # Gets the next batch of images
-            image, mask, gt = [x.to(device) for x in next(iterator_train)]
+            image, mask, gt = [x.double().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img

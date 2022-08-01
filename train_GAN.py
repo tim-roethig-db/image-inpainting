@@ -73,7 +73,7 @@ if __name__ == "__main__":
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
             # Gets the next batch of images
-            image, mask, gt = [x.to(device) for x in next(iterator_train)]
+            image, mask, gt = [x.double().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img

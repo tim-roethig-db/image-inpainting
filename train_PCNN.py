@@ -57,7 +57,7 @@ if __name__ == '__main__':
             #model.train()
 
             # Gets the next batch of images
-            image, mask, gt = [x.to(device) for x in next(iterator_train)]
+            image, mask, gt = [x.double().to(device) for x in next(iterator_train)]
 
             # Forward-propagates images through net
             # Mask is also propagated, though it is usually gone by the decoding stage
