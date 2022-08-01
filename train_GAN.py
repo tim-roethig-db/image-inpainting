@@ -16,6 +16,7 @@ if __name__ == "__main__":
     beta2 = 0.999
     n_samples = 10
     test_size = 2
+    j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=n_samples)
@@ -89,7 +90,6 @@ if __name__ == "__main__":
             optimG.step()
             optimD.step()
 
-            j = 1
             if i % j == 0:
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
