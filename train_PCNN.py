@@ -12,12 +12,12 @@ def requires_grad(param):
 
 
 if __name__ == '__main__':
-    batch_size = 2
+    batch_size = 16
     lr = 0.01
-    epochs = 1
-    n_samples = 10
-    test_size = 2
-    j = 1
+    epochs = 10
+    n_samples = 160000
+    test_size = 10000
+    j = 50
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=n_samples)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
                 image, mask, ground_truth = [], [], []
                 for k in range(test_size):
-                    im, m, gt = [x.to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                    im, m, gt = [x for x in data_train[data_train.num_imgs - test_size + k]]
                     im, m, gt = im[None, :, :, :], m[None, :, :, :], gt[None, :, :, :]
                     image.append(im)
                     mask.append(m)
