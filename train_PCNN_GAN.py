@@ -8,12 +8,12 @@ from model import InpaintGenerator, Discriminator, PartialConvNet
 
 
 if __name__ == "__main__":
-    batch_size = 16
+    batch_size = 2
     lr = 0.01
-    epochs = 10
-    n_samples = 160000
-    test_size = 10000
-    j = 50
+    epochs = 1
+    n_samples = 14
+    test_size = 10
+    j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=n_samples)
@@ -86,6 +86,8 @@ if __name__ == "__main__":
             optimD.step()
 
             if i % j == 0:
+                generator.eval()
+
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
                 monitor_dis_loss += dis_loss
@@ -93,25 +95,21 @@ if __name__ == "__main__":
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
 
-                image, mask, ground_truth = [], [], []
-                for k in range(test_size):
-                    im, m, gt = [x for x in data_train[data_train.num_imgs - test_size + k]]
-                    im, m, gt = im[None, :, :, :], m[None, :, :, :], gt[None, :, :, :]
-                    image.append(im)
-                    mask.append(m)
-                    ground_truth.append(gt)
-
-                image = torch.cat(image)
-                mask = torch.cat(mask)
-                ground_truth = torch.cat(ground_truth)
-
-                generator.eval()
+                test_losses = list()
                 with torch.no_grad():
-                    pred_img = generator(image, mask)
-                generator.train()
+                    for k in range(test_size):
+                        image, mask, ground_truth = [x.to(device) for x in
+                                                     data_train[data_train.num_imgs - test_size + k]]
+                        image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :,
+                                                                                               :]
 
-                comp_img = (1 - mask) * ground_truth + mask * pred_img
-                l1_loss = l1(comp_img, ground_truth).item()
+                        pred_img = generator(image, mask)
+
+                        comp_img = (1 - mask) * ground_truth + mask * pred_img
+                        test_losses.append(l1(comp_img, ground_truth).item())
+
+                l1_loss = sum(test_losses) / len(test_losses)
+
                 print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}, l1_test: {round(l1_loss, 4)}")
 
                 loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item(), l1_loss])
@@ -119,6 +117,8 @@ if __name__ == "__main__":
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0
+
+                generator.train()
             else:
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
