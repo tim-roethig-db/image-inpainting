@@ -9,12 +9,13 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 16
+    batch_size = 2
+    test_batch_size = 10
     lr = 0.0001
     epochs = 1
     block_num = 4
-    n_samples = 1032
-    test_size = 1000
+    n_samples = 14
+    test_size = 10
     j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -70,14 +71,14 @@ if __name__ == "__main__":
         monitor_gen_loss = 0
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
-
+            """
             for i in range(4):
                 t = torch.cuda.get_device_properties(0).total_memory
                 r = torch.cuda.memory_reserved(0)
                 a = torch.cuda.memory_allocated(0)
                 f = r-a
                 print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-
+            """
             # Gets the next batch of images
             image, mask, gt = [x.double().to(device) for x in next(iterator_train)]
 
@@ -95,14 +96,10 @@ if __name__ == "__main__":
             optimG.step()
             optimD.step()
 
-            for i in range(4):
-                t = torch.cuda.get_device_properties(0).total_memory
-                r = torch.cuda.memory_reserved(0)
-                a = torch.cuda.memory_allocated(0)
-                f = r-a
-                print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-
             if i % j == 0:
+                print('eval start')
+                generator.eval()
+
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
                 monitor_dis_loss += dis_loss
@@ -110,34 +107,20 @@ if __name__ == "__main__":
                 monitor_gen_loss = monitor_gen_loss / j
                 monitor_dis_loss = monitor_dis_loss / j
 
-                image, mask, ground_truth = [], [], []
-                for k in range(test_size):
-                    im, m, gt = [x for x in data_train[data_train.num_imgs - test_size + k]]
-                    im, m, gt = im[None, :, :, :], m[None, :, :, :], gt[None, :, :, :]
-                    image.append(im)
-                    mask.append(m)
-                    ground_truth.append(gt)
-
-                image = torch.cat(image)
-                mask = torch.cat(mask)
-                ground_truth = torch.cat(ground_truth)
-
-                torch.save(generator.state_dict(), "checkpoint.t7")
-                checkpoint = InpaintGenerator(rates=[1, 2, 4, 8], block_num=block_num).double()
-                checkpoint = checkpoint.to(torch.device('cpu'))
-                state_dict = torch.load('checkpoint.t7', map_location='cpu')
-                new_state_dict = OrderedDict()
-                for k, v in state_dict.items():
-                    name = k[7:] # remove `module.`
-                    new_state_dict[name] = v
-
-                checkpoint.load_state_dict(new_state_dict)
-                checkpoint.eval()
+                test_losses = list()
                 with torch.no_grad():
-                    pred_img = checkpoint(image, mask)
+                    for k in range(test_size):
+                        print(k)
+                        image, mask, ground_truth = [x.to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                        image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
 
-                comp_img = (1 - mask) * ground_truth + mask * pred_img
-                l1_loss = l1(comp_img, ground_truth).item()
+                        pred_img = generator(image, mask)
+
+                        comp_img = (1 - mask) * ground_truth + mask * pred_img
+                        test_losses.append(l1(comp_img, ground_truth).item())
+
+                l1_loss = sum(test_losses) / len(test_losses)
+
                 print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}, l1_test: {round(l1_loss, 4)}")
 
                 loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item(), l1_loss])
@@ -145,6 +128,9 @@ if __name__ == "__main__":
                 monitor_l1_loss = 0
                 monitor_gen_loss = 0
                 monitor_dis_loss = 0
+
+                generator.train()
+                print('eval end')
             else:
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
