@@ -9,13 +9,12 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 2
-    test_batch_size = 10
+    batch_size = 32
     lr = 0.0001
     epochs = 1
     block_num = 4
-    n_samples = 14
-    test_size = 10
+    n_samples = 1064
+    test_size = 1000
     j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -97,7 +96,6 @@ if __name__ == "__main__":
             optimD.step()
 
             if i % j == 0:
-                print('eval start')
                 generator.eval()
 
                 monitor_l1_loss += l1(comp_img, gt)
@@ -110,7 +108,6 @@ if __name__ == "__main__":
                 test_losses = list()
                 with torch.no_grad():
                     for k in range(test_size):
-                        print(k)
                         image, mask, ground_truth = [x.to(device) for x in data_train[data_train.num_imgs - test_size + k]]
                         image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
 
@@ -130,7 +127,6 @@ if __name__ == "__main__":
                 monitor_dis_loss = 0
 
                 generator.train()
-                print('eval end')
             else:
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
