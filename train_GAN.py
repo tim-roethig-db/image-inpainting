@@ -8,12 +8,12 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 16
+    batch_size = 32
     lr = 0.0001
-    epochs = 10
-    n_samples = 193000
-    test_size = 1000
-    j = 100
+    epochs = 1
+    n_samples = 650
+    test_size = 10
+    j = 1
     block_num = 4
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         for i in range(1, iters_per_epoch+1):
             print(i)
             # Gets the next batch of images
-            image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
+            image, mask, gt = [x.float() for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
@@ -85,12 +85,12 @@ if __name__ == "__main__":
 
             dis_loss.backward()
 
-            for i in range(4):
+            for k in range(4):
                 t = torch.cuda.get_device_properties(0).total_memory / 1024 / 1024
                 r = torch.cuda.memory_reserved(0) / 1024 / 1024
                 a = torch.cuda.memory_allocated(0) / 1024 / 1024
                 f = r-a
-                print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
+                print(f"{k} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
 
             optimG.step()
             optimD.step()
@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 test_losses = list()
                 with torch.no_grad():
                     for k in range(test_size):
-                        image, mask, ground_truth = [x.float().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                        image, mask, ground_truth = [x.float() for x in data_train[data_train.num_imgs - test_size + k]]
                         image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
 
                         pred_img = generator(image, mask)

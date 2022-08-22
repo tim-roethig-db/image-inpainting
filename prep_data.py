@@ -15,7 +15,7 @@ class PrepData(torch.utils.data.Dataset):
         self.min_patch_size = 0.2
         self.max_patch_size = 0.3
 
-        self.img_paths = glob.glob('data/data_celeba/*.jpg')
+        self.img_paths = glob.glob('data_celeba/*.jpg')
         self.img_paths = self.img_paths[:self.n_samples]
         random.shuffle(self.img_paths)
 
