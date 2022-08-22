@@ -9,7 +9,7 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 24
+    batch_size = 32
     lr = 0.0001
     epochs = 1
     block_num = 4
@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 a = torch.cuda.memory_allocated(0)
                 f = r-a
                 print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-            
+
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
 
