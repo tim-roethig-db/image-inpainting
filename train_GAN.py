@@ -86,9 +86,9 @@ if __name__ == "__main__":
             dis_loss.backward()
 
             for i in range(4):
-                t = torch.cuda.get_device_properties(0).total_memory
-                r = torch.cuda.memory_reserved(0)
-                a = torch.cuda.memory_allocated(0)
+                t = torch.cuda.get_device_properties(0).total_memory / 1024 / 1024
+                r = torch.cuda.memory_reserved(0) / 1024 / 1024
+                a = torch.cuda.memory_allocated(0) / 1024 / 1024
                 f = r-a
                 print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
 
