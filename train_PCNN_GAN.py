@@ -126,7 +126,7 @@ if __name__ == "__main__":
         columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss', 'l1_test'],
         data=loss_df
     )
-    loss_df.to_csv(f"pcnn_gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.csv", index=False, sep=';')
+    loss_df.to_csv(f"pcnn_gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.csv", index=False, sep=';')
 
-    torch.save(generator.state_dict(), f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.t7")
-    torch.save(discriminator.state_dict(), f"gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}.t7")
+    torch.save(generator.state_dict(), f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.t7")
+    torch.save(discriminator.state_dict(), f"gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.t7")

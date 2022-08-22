@@ -73,14 +73,14 @@ if __name__ == "__main__":
             print(i)
             # Gets the next batch of images
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
-
+            """
             for i in range(4):
                 t = torch.cuda.get_device_properties(0).total_memory
                 r = torch.cuda.memory_reserved(0)
                 a = torch.cuda.memory_allocated(0)
                 f = r-a
                 print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-
+            """
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss', 'l1_test'],
         data=loss_df
     )
-    loss_df.to_csv(f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_block_num_{block_num}.csv", index=False, sep=';')
+    loss_df.to_csv(f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_block_num_{block_num}_nsamples_{n_samples}_test_size_{test_size}.csv", index=False, sep=';')
 
-    torch.save(generator.state_dict(), f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_block_num_{block_num}.t7")
-    torch.save(discriminator.state_dict(), f"gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_block_num_{block_num}.t7")
+    torch.save(generator.state_dict(), f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_block_num_{block_num}_nsamples_{n_samples}_test_size_{test_size}.t7")
+    torch.save(discriminator.state_dict(), f"gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_block_num_{block_num}_nsamples_{n_samples}_test_size_{test_size}.t7")
