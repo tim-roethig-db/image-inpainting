@@ -79,7 +79,7 @@ class VGG16Extractor(nn.Module):
 class CalculateLoss(nn.Module):
     def __init__(self):
         super().__init__()
-        self.vgg_extract = VGG16Extractor()
+        self.vgg_extract = VGG16Extractor().float()
         self.l1 = nn.L1Loss()
 
     def forward(self, weights, input_x, mask, output, ground_truth, netD=None):
