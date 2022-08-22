@@ -84,7 +84,6 @@ class CalculateLoss(nn.Module):
 
     def forward(self, weights, input_x, mask, output, ground_truth, netD=None):
         composed_output = (input_x * mask) + (output * (1 - mask))
-        print(composed_output.dtype)
         fs_composed_output = self.vgg_extract(composed_output)
         fs_output = self.vgg_extract(output)
         fs_ground_truth = self.vgg_extract(ground_truth)

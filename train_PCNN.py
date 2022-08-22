@@ -8,10 +8,10 @@ from loss import CalculateLoss
 
 
 if __name__ == '__main__':
-    batch_size = 2
+    batch_size = 24
     lr = 0.01
     epochs = 1
-    n_samples = 14
+    n_samples = 490
     test_size = 10
     j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -63,10 +63,6 @@ if __name__ == '__main__':
             # Mask is also propagated, though it is usually gone by the decoding stage
             pred_img = model(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
-            print(image.dtype)
-            print(mask.dtype)
-            print(gt.dtype)
-            print(pred_img.dtype)
 
             loss_dict = loss_func(loss_weights, image, mask, pred_img, gt)
 
