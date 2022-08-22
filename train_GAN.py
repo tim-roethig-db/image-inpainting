@@ -70,7 +70,6 @@ if __name__ == "__main__":
         monitor_gen_loss = 0
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
-            print(i)
             # Gets the next batch of images
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
             """
