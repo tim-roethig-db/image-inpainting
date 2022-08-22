@@ -13,7 +13,7 @@ if __name__ == "__main__":
     lr = 0.0001
     epochs = 1
     block_num = 4
-    n_samples = 64
+    n_samples = 74
     test_size = 10
     j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
