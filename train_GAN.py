@@ -69,16 +69,10 @@ if __name__ == "__main__":
         monitor_gen_loss = 0
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
+            print(i)
             # Gets the next batch of images
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
-            """
-            for i in range(4):
-                t = torch.cuda.get_device_properties(0).total_memory
-                r = torch.cuda.memory_reserved(0)
-                a = torch.cuda.memory_allocated(0)
-                f = r-a
-                print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-            """
+
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
 
@@ -90,6 +84,14 @@ if __name__ == "__main__":
             sum(loss_dict.values()).backward()
 
             dis_loss.backward()
+
+            for i in range(4):
+                t = torch.cuda.get_device_properties(0).total_memory
+                r = torch.cuda.memory_reserved(0)
+                a = torch.cuda.memory_allocated(0)
+                f = r-a
+                print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
+
             optimG.step()
             optimD.step()
 
