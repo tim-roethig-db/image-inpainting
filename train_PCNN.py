@@ -7,17 +7,13 @@ from model import PartialConvNet
 from loss import CalculateLoss
 
 
-def requires_grad(param):
-    return param.requires_grad
-
-
 if __name__ == '__main__':
-    batch_size = 16
+    batch_size = 24
     lr = 0.01
-    epochs = 10
-    n_samples = 161000
-    test_size = 1000
-    j = 100
+    epochs = 2
+    n_samples = 490
+    test_size = 10
+    j = 1
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=n_samples)
@@ -35,7 +31,10 @@ if __name__ == '__main__':
     )
     print("Trainable model parameters:", pytorch_total_params)
 
-    optimizer = torch.optim.Adam(filter(requires_grad, model.parameters()), lr=lr)
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=lr,
+    )
     print("Setup Adam optimizer...")
 
     l1 = torch.nn.L1Loss()
