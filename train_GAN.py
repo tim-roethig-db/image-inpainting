@@ -8,19 +8,19 @@ from model import InpaintGenerator, Discriminator
 
 
 if __name__ == "__main__":
-    batch_size = 32
+    batch_size = 24
     lr = 0.0001
-    epochs = 1
-    n_samples = 650
-    test_size = 10
-    j = 1
+    epochs = 10
+    n_samples = 193000
+    test_size = 1000
+    j = 100
     block_num = 4
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     data_train = PrepData(n_samples=n_samples)
     print(f"Loaded training dataset with {data_train.num_imgs} samples")
 
-    iters_per_epoch = (n_samples - test_size) // batch_size
+    iters_per_epoch = (data_train.num_imgs - test_size) // batch_size
 
     generator = InpaintGenerator(rates=[1, 2, 4, 8], block_num=block_num).float()
     generator = torch.nn.DataParallel(generator)
@@ -69,7 +69,6 @@ if __name__ == "__main__":
         monitor_gen_loss = 0
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
-            print(i)
             # Gets the next batch of images
             image, mask, gt = [x.float() for x in next(iterator_train)]
 
@@ -84,14 +83,14 @@ if __name__ == "__main__":
             sum(loss_dict.values()).backward()
 
             dis_loss.backward()
-
+            """
             for k in range(4):
                 t = torch.cuda.get_device_properties(0).total_memory / 1024 / 1024
                 r = torch.cuda.memory_reserved(0) / 1024 / 1024
                 a = torch.cuda.memory_allocated(0) / 1024 / 1024
                 f = r-a
                 print(f"{k} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-
+            """
             optimG.step()
             optimD.step()
 
