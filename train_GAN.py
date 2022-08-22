@@ -73,14 +73,14 @@ if __name__ == "__main__":
             print(i)
             # Gets the next batch of images
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
-            """
+
             for i in range(4):
                 t = torch.cuda.get_device_properties(0).total_memory
                 r = torch.cuda.memory_reserved(0)
                 a = torch.cuda.memory_allocated(0)
                 f = r-a
                 print(f"{i} total: {t}, reserved: {r}, allocated: {a}, free: {f}")
-            """
+            
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
 
