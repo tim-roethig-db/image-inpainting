@@ -63,6 +63,10 @@ if __name__ == '__main__':
             # Mask is also propagated, though it is usually gone by the decoding stage
             pred_img = model(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
+            print(image.dtype)
+            print(mask.dtype)
+            print(gt.dtype)
+            print(pred_img.dtype)
 
             loss_dict = loss_func(loss_weights, image, mask, pred_img, gt)
 
