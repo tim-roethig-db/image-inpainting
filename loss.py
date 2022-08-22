@@ -58,7 +58,7 @@ def gen_loss(netD, fake):
 class VGG16Extractor(nn.Module):
     def __init__(self):
         super().__init__()
-        vgg16 = models.vgg16(pretrained=True)
+        vgg16 = models.vgg16(pretrained=True).float()
         self.max_pooling1 = vgg16.features[:5]
         self.max_pooling2 = vgg16.features[5:10]
         self.max_pooling3 = vgg16.features[10:17]
@@ -79,12 +79,12 @@ class VGG16Extractor(nn.Module):
 class CalculateLoss(nn.Module):
     def __init__(self):
         super().__init__()
-        self.vgg_extract = VGG16Extractor().float()
+        self.vgg_extract = VGG16Extractor()
         self.l1 = nn.L1Loss()
 
     def forward(self, weights, input_x, mask, output, ground_truth, netD=None):
         composed_output = (input_x * mask) + (output * (1 - mask))
-
+        print(composed_output.dtype)
         fs_composed_output = self.vgg_extract(composed_output)
         fs_output = self.vgg_extract(output)
         fs_ground_truth = self.vgg_extract(ground_truth)
