@@ -21,10 +21,10 @@ if __name__ == "__main__":
 
     iters_per_epoch = (data_train.num_imgs - test_size) // batch_size
 
-    generator = PartialConvNet().half()
+    generator = PartialConvNet().float()
     generator = torch.nn.DataParallel(generator)
     generator = generator.to(device)
-    discriminator = Discriminator().half()
+    discriminator = Discriminator().float()
     discriminator = torch.nn.DataParallel(discriminator)
     discriminator = discriminator.to(device)
     print("Loaded model to device...")
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
             print(i)
-            image, mask, gt = [x.half().to(device) for x in next(iterator_train)]
+            image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
@@ -98,7 +98,7 @@ if __name__ == "__main__":
                 test_losses = list()
                 with torch.no_grad():
                     for k in range(test_size):
-                        image, mask, ground_truth = [x.half().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                        image, mask, ground_truth = [x.float().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
                         image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
 
                         pred_img = generator(image, mask)
@@ -122,13 +122,11 @@ if __name__ == "__main__":
                 monitor_gen_loss += loss_dict['gen_loss']
                 monitor_dis_loss += dis_loss
 
-            #torch.cuda.empty_cache()
-
     loss_df = pd.DataFrame(
         columns=['epoch', 'iteration', 'l1', 'generator_loss', 'discriminator_loss', 'l1_test'],
         data=loss_df
     )
     loss_df.to_csv(f"pcnn_gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.csv", index=False, sep=';')
 
-    torch.save(generator.state_dict(), f"gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.t7")
-    torch.save(discriminator.state_dict(), f"gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.t7")
+    torch.save(generator.state_dict(), f"pcnn_gan_gen_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.t7")
+    torch.save(discriminator.state_dict(), f"pcnn_gan_dis_lr_{lr}_epoch_{epochs}_batch_size_{batch_size}_nsamples_{n_samples}_test_size_{test_size}.t7")
