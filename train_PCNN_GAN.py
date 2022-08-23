@@ -69,7 +69,7 @@ if __name__ == "__main__":
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
             # Gets the next batch of images
-            image, mask, gt = [x.float() for x in next(iterator_train)]
+            image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
@@ -98,7 +98,7 @@ if __name__ == "__main__":
                 test_losses = list()
                 with torch.no_grad():
                     for k in range(test_size):
-                        image, mask, ground_truth = [x.float() for x in data_train[data_train.num_imgs - test_size + k]]
+                        image, mask, ground_truth = [x.float().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
                         image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
 
                         pred_img = generator(image, mask)

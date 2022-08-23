@@ -57,7 +57,7 @@ if __name__ == '__main__':
             #model.train()
 
             # Gets the next batch of images
-            image, mask, gt = [x.float() for x in next(iterator_train)]
+            image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             # Forward-propagates images through net
             # Mask is also propagated, though it is usually gone by the decoding stage
@@ -82,7 +82,7 @@ if __name__ == '__main__':
                 test_losses = list()
                 with torch.no_grad():
                     for k in range(test_size):
-                        image, mask, ground_truth = [x.float() for x in data_train[data_train.num_imgs - test_size + k]]
+                        image, mask, ground_truth = [x.float().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
                         image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
 
                         pred_img = model(image, mask)
