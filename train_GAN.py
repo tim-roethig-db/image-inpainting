@@ -10,8 +10,8 @@ from model import InpaintGenerator, Discriminator
 if __name__ == "__main__":
     batch_size = 16
     lr = 0.0001
-    epochs = 1
-    n_samples = 4216
+    epochs = 10
+    n_samples = 161000
     test_size = 1000
     j = 100
     block_num = 4
