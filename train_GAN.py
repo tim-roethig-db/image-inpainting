@@ -11,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 24
     lr = 0.0001
     epochs = 1
-    n_samples = 490
+    n_samples = 4900
     test_size = 10
     j = 1
     block_num = 4
