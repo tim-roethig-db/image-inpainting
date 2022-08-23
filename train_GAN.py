@@ -11,9 +11,9 @@ if __name__ == "__main__":
     batch_size = 16
     lr = 0.0001
     epochs = 1
-    n_samples = 170
-    test_size = 10
-    j = 1
+    n_samples = 4200
+    test_size = 1000
+    j = 100
     block_num = 4
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -68,6 +68,7 @@ if __name__ == "__main__":
         monitor_gen_loss = 0
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
+            print(i)
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
