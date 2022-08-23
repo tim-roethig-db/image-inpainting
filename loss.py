@@ -58,7 +58,7 @@ def gen_loss(netD, fake):
 class VGG16Extractor(nn.Module):
     def __init__(self):
         super().__init__()
-        vgg16 = models.vgg16(pretrained=True).float()
+        vgg16 = models.vgg16(pretrained=True).half()
         self.max_pooling1 = vgg16.features[:5]
         self.max_pooling2 = vgg16.features[5:10]
         self.max_pooling3 = vgg16.features[10:17]
