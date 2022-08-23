@@ -101,6 +101,8 @@ if __name__ == '__main__':
             else:
                 monitor_l1_loss += l1(comp_img, gt)
 
+            torch.cuda.empty_cache()
+
     loss_df = pd.DataFrame(
         columns=['epoch', 'iteration', 'l1', 'l1_test'],
         data=loss_df
