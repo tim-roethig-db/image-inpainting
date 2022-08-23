@@ -10,8 +10,8 @@ from model import InpaintGenerator, Discriminator
 if __name__ == "__main__":
     batch_size = 24
     lr = 0.0001
-    epochs = 10
-    n_samples = 193000
+    epochs = 1
+    n_samples = 5800
     test_size = 1000
     j = 100
     block_num = 4
@@ -130,7 +130,7 @@ if __name__ == "__main__":
                 monitor_l1_loss += l1(comp_img, gt)
                 monitor_gen_loss += loss_dict['gen_loss']
                 monitor_dis_loss += dis_loss
-                torch.cuda.empty_cache()
+                #torch.cuda.empty_cache()
 
 
     loss_df = pd.DataFrame(

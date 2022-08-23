@@ -11,7 +11,7 @@ if __name__ == '__main__':
     batch_size = 24
     lr = 0.01
     epochs = 1
-    n_samples = 4910
+    n_samples = 5910
     test_size = 10
     j = 100
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
