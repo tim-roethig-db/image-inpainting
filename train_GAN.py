@@ -62,14 +62,12 @@ if __name__ == "__main__":
             batch_size=batch_size,
         ))
 
-        # TRAINING LOOP
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")
 
         monitor_l1_loss = 0
         monitor_gen_loss = 0
         monitor_dis_loss = 0
         for i in range(1, iters_per_epoch+1):
-            # Gets the next batch of images
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
@@ -80,8 +78,8 @@ if __name__ == "__main__":
 
             optimG.zero_grad()
             optimD.zero_grad()
-            sum(loss_dict.values()).backward()
 
+            sum(loss_dict.values()).backward()
             dis_loss.backward()
             """
             for k in range(4):

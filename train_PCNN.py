@@ -11,7 +11,7 @@ if __name__ == '__main__':
     batch_size = 24
     lr = 0.01
     epochs = 1
-    n_samples = 5800
+    n_samples = 3424
     test_size = 1000
     j = 100
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -43,34 +43,28 @@ if __name__ == '__main__':
     print("Setup loss function...")
 
     loss_df = list()
+    model.train()
     for epoch in range(1, epochs + 1):
         iterator_train = iter(data.DataLoader(
             data_train,
-            batch_size=batch_size, ))
+            batch_size=batch_size,
+        ))
 
-        # TRAINING LOOP
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")
 
         monitor_l1_loss = 0
         for i in range(1, iters_per_epoch + 1):
-            # Sets model to train mode
-            #model.train()
-
-            # Gets the next batch of images
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
-            # Forward-propagates images through net
-            # Mask is also propagated, though it is usually gone by the decoding stage
             pred_img = model(image, mask)
             comp_img = (1 - mask) * gt + mask * pred_img
 
             loss_dict = loss_func(loss_weights, image, mask, pred_img, gt)
 
-            # Resets gradient accumulator in optimizer
             optimizer.zero_grad()
-            # back-propogates gradients through model weights
+
             sum(loss_dict.values()).backward()
-            # updates the weights
+
             optimizer.step()
 
             if i % j == 0:
