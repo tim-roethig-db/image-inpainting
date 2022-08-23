@@ -68,7 +68,6 @@ if __name__ == "__main__":
         monitor_gen_loss = list()
         monitor_dis_loss = list()
         for i in range(1, iters_per_epoch+1):
-            print(i)
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
