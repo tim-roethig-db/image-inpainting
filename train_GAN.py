@@ -11,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 16
     lr = 0.0001
     epochs = 1
-    n_samples = 7400
+    n_samples = 4200
     test_size = 1000
     j = 100
     block_num = 4
@@ -64,11 +64,11 @@ if __name__ == "__main__":
 
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")
 
-        monitor_l1_loss = 0
-        monitor_gen_loss = 0
-        monitor_dis_loss = 0
+        monitor_l1_loss = list()
+        monitor_gen_loss = list()
+        monitor_dis_loss = list()
         for i in range(1, iters_per_epoch+1):
-            #print(i)
+            print(i)
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
 
             pred_img = generator(image, mask)
@@ -96,12 +96,12 @@ if __name__ == "__main__":
             if i % j == 0:
                 generator.eval()
 
-                monitor_l1_loss += l1(comp_img, gt)
-                monitor_gen_loss += loss_dict['gen_loss']
-                monitor_dis_loss += dis_loss
-                monitor_l1_loss = monitor_l1_loss / j
-                monitor_gen_loss = monitor_gen_loss / j
-                monitor_dis_loss = monitor_dis_loss / j
+                monitor_l1_loss.append(l1(comp_img, gt).item())
+                monitor_gen_loss.append(loss_dict['gen_loss'].item())
+                monitor_dis_loss.append(dis_loss.item())
+                monitor_l1_loss = sum(monitor_l1_loss) / len(monitor_l1_loss)
+                monitor_gen_loss = sum(monitor_gen_loss) / len(monitor_gen_loss)
+                monitor_dis_loss = sum(monitor_dis_loss) / len(monitor_dis_loss)
 
                 test_losses = list()
                 with torch.no_grad():
@@ -116,19 +116,19 @@ if __name__ == "__main__":
 
                 l1_loss = sum(test_losses) / len(test_losses)
 
-                print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, gen_los: {round(monitor_gen_loss.item(), 4)}, dis_loss: {round(monitor_dis_loss.item(), 4)}, l1_test: {round(l1_loss, 4)}")
+                print(f"{i} l1: {round(monitor_l1_loss, 4)}, gen_los: {round(monitor_gen_loss, 4)}, dis_loss: {round(monitor_dis_loss, 4)}, l1_test: {round(l1_loss, 4)}")
 
-                loss_df.append([epoch, i, monitor_l1_loss.item(), monitor_gen_loss.item(), monitor_dis_loss.item(), l1_loss])
+                loss_df.append([epoch, i, monitor_l1_loss, monitor_gen_loss, monitor_dis_loss, l1_loss])
 
-                monitor_l1_loss = 0
-                monitor_gen_loss = 0
-                monitor_dis_loss = 0
+                monitor_l1_loss = list()
+                monitor_gen_loss = list()
+                monitor_dis_loss = list()
 
                 generator.train()
             else:
-                monitor_l1_loss += l1(comp_img, gt)
-                monitor_gen_loss += loss_dict['gen_loss']
-                monitor_dis_loss += dis_loss
+                monitor_l1_loss.append(l1(comp_img, gt).item())
+                monitor_gen_loss.append(loss_dict['gen_loss'].item())
+                monitor_dis_loss.append(dis_loss.item())
 
             #torch.cuda.empty_cache()
 
