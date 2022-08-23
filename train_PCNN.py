@@ -77,13 +77,13 @@ if __name__ == '__main__':
                 test_losses = list()
                 with torch.no_grad():
                     for k in range(test_size):
-                        image, mask, ground_truth = [x.float().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
-                        image, mask, ground_truth = image[None, :, :, :], mask[None, :, :, :], ground_truth[None, :, :, :]
+                        test_image, test_mask, test_gt = [x.float().to(device) for x in data_train[data_train.num_imgs - test_size + k]]
+                        test_image, test_mask, test_gt = test_image[None, :, :, :], test_mask[None, :, :, :], test_gt[None, :, :, :]
 
-                        pred_img = model(image, mask)
+                        test_pred_img = model(test_image, test_mask)
 
-                        comp_img = (1 - mask) * ground_truth + mask * pred_img
-                        test_losses.append(l1(comp_img, ground_truth).item())
+                        test_comp_img = (1 - test_mask) * test_gt + test_mask * test_pred_img
+                        test_losses.append(l1(test_comp_img, test_gt).item())
 
                 l1_loss = sum(test_losses) / len(test_losses)
 
