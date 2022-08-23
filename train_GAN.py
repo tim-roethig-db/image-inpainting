@@ -11,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 16
     lr = 0.0001
     epochs = 1
-    n_samples = 4200
+    n_samples = 4216
     test_size = 1000
     j = 100
     block_num = 4
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             optimG.step()
             optimD.step()
 
-            if i % j == 0:
+            if i % j == 1:
                 generator.eval()
 
                 monitor_l1_loss.append(l1(comp_img, gt).item())

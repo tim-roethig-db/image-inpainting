@@ -11,7 +11,7 @@ if __name__ == '__main__':
     batch_size = 16
     lr = 0.01
     epochs = 1
-    n_samples = 7400
+    n_samples = 4216
     test_size = 1000
     j = 100
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
         print(f"EPOCH:{epoch} of {epochs} - starting training loop from iteration:0 to iteration:{iters_per_epoch}")
 
-        monitor_l1_loss = 0
+        monitor_l1_loss = list()
         for i in range(1, iters_per_epoch + 1):
             print(i)
             image, mask, gt = [x.float().to(device) for x in next(iterator_train)]
@@ -68,11 +68,11 @@ if __name__ == '__main__':
 
             optimizer.step()
 
-            if i % j == 0:
+            if i % j == 1:
                 model.eval()
 
-                monitor_l1_loss += l1(comp_img, gt)
-                monitor_l1_loss = monitor_l1_loss / j
+                monitor_l1_loss.append(l1(comp_img, gt).item())
+                monitor_l1_loss = sum(monitor_l1_loss) / len(monitor_l1_loss)
 
                 test_losses = list()
                 with torch.no_grad():
@@ -87,14 +87,14 @@ if __name__ == '__main__':
 
                 l1_loss = sum(test_losses) / len(test_losses)
 
-                print(f"{i} l1: {round(monitor_l1_loss.item(), 4)}, l1_test: {round(l1_loss, 4)}")
-                loss_df.append([epoch, i, monitor_l1_loss.item(), l1_loss])
+                print(f"{i} l1: {round(monitor_l1_loss, 4)}, l1_test: {round(l1_loss, 4)}")
+                loss_df.append([epoch, i, monitor_l1_loss, l1_loss])
 
-                monitor_l1_loss = 0
+                monitor_l1_loss = list()
 
                 model.train()
             else:
-                monitor_l1_loss += l1(comp_img, gt)
+                monitor_l1_loss.append(l1(comp_img, gt).item())
 
     loss_df = pd.DataFrame(
         columns=['epoch', 'iteration', 'l1', 'l1_test'],
