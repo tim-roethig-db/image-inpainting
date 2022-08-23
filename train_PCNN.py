@@ -10,9 +10,9 @@ from loss import CalculateLoss
 if __name__ == '__main__':
     batch_size = 24
     lr = 0.01
-    epochs = 10
-    n_samples = 193000
-    test_size = 1000
+    epochs = 1
+    n_samples = 4910
+    test_size = 1010
     j = 100
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
