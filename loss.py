@@ -115,6 +115,7 @@ class dis_loss(nn.Module):
         fake_detach = fake.detach()
         d_fake = netD(fake_detach)
         d_real = netD(real)
+        print(d_real.shape)
         dis_loss = self.loss_fn(-d_real).mean() + self.loss_fn(d_fake).mean()
 
         return dis_loss
